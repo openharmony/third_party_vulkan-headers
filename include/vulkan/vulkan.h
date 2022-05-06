@@ -85,6 +85,11 @@
 #include "vulkan_screen.h"
 #endif
 
+#ifdef VK_USE_PLATFORM_OHOS
+#include <native_window/window.h>
+#include "vulkan_ohos.h"
+#endif
+
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 #include "vulkan_beta.h"
 #endif
