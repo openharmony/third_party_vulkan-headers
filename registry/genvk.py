@@ -397,6 +397,11 @@ def makeGenOpts(args):
         [ 'vulkan_metal.h',       [ 'VK_EXT_metal_surface'        ], commonSuppressExtensions ],
         [ 'vulkan_screen.h',      [ 'VK_QNX_screen_surface'       ], commonSuppressExtensions ],
         [ 'vulkan_beta.h',        betaRequireExtensions,             betaSuppressExtensions ],
+        [ 'vulkan_ohos.h',        [ 'VK_OpenHarmony_OHOS_surface',
+                                    'VK_OpenHarmony_external_memory_ohos_native_buffer'
+                                                                  ], commonSuppressExtensions +
+                                                                      [ 'VK_KHR_format_feature_flags2',
+                                                                      ] ],
     ]
 
     for platform in platforms:

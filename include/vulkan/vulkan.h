@@ -85,8 +85,7 @@
 #include "vulkan_screen.h"
 #endif
 
-#ifdef VK_USE_PLATFORM_OHOS
-#include <native_window/window.h>
+#ifdef VK_USE_PLATFORM_OHOS_OPENHARMONY
 #include "vulkan_ohos.h"
 #endif
 
