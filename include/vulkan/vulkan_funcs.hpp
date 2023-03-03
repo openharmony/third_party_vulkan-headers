@@ -8717,68 +8717,6 @@ namespace VULKAN_HPP_NAMESPACE
   }
 #endif /*VK_USE_PLATFORM_WIN32_KHR*/
 
-
-#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
-  //=== VK_OpenHarmony_OHOS_surface ===
-
-  template <typename Dispatch>
-  VULKAN_HPP_NODISCARD VULKAN_HPP_INLINE Result
-    Instance::createOHOSSurfaceOpenHarmony( const VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony * pCreateInfo,
-                                            const VULKAN_HPP_NAMESPACE::AllocationCallbacks *              pAllocator,
-                                            VULKAN_HPP_NAMESPACE::SurfaceKHR *                             pSurface,
-                                            Dispatch const & d ) const VULKAN_HPP_NOEXCEPT
-  {
-    VULKAN_HPP_ASSERT( d.getVkHeaderVersion() == VK_HEADER_VERSION );
-    return static_cast<Result>(
-      d.vkCreateOHOSSurfaceOpenHarmony( m_instance,
-                                        reinterpret_cast<const VkOHOSSurfaceCreateInfoOpenHarmony *>( pCreateInfo ),
-                                        reinterpret_cast<const VkAllocationCallbacks *>( pAllocator ),
-                                        reinterpret_cast<VkSurfaceKHR *>( pSurface ) ) );
-  }
-
-#  ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
-  template <typename Dispatch>
-  VULKAN_HPP_NODISCARD_WHEN_NO_EXCEPTIONS VULKAN_HPP_INLINE
-    typename ResultValueType<VULKAN_HPP_NAMESPACE::SurfaceKHR>::type
-    Instance::createOHOSSurfaceOpenHarmony( const VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony & createInfo,
-                                            Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator,
-                                            Dispatch const &                                          d ) const
-  {
-    VULKAN_HPP_ASSERT( d.getVkHeaderVersion() == VK_HEADER_VERSION );
-    VULKAN_HPP_NAMESPACE::SurfaceKHR surface;
-    Result                           result = static_cast<Result>(
-      d.vkCreateOHOSSurfaceOpenHarmony( m_instance,
-                                        reinterpret_cast<const VkOHOSSurfaceCreateInfoOpenHarmony *>( &createInfo ),
-                                        reinterpret_cast<const VkAllocationCallbacks *>(
-                                        static_cast<const VULKAN_HPP_NAMESPACE::AllocationCallbacks *>( allocator ) ),
-                                        reinterpret_cast<VkSurfaceKHR *>( &surface ) ) );
-    return createResultValue( result, surface, VULKAN_HPP_NAMESPACE_STRING "::Instance::createOHOSSurfaceOpenHarmony" );
-  }
-
-#    ifndef VULKAN_HPP_NO_SMART_HANDLE
-  template <typename Dispatch>
-  VULKAN_HPP_NODISCARD_WHEN_NO_EXCEPTIONS VULKAN_HPP_INLINE
-    typename ResultValueType<UniqueHandle<VULKAN_HPP_NAMESPACE::SurfaceKHR, Dispatch>>::type
-    Instance::createOHOSSurfaceOpenHarmonyUnique( const VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony & createInfo,
-                                                  Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator,
-                                                  Dispatch const &                                          d ) const
-  {
-    VULKAN_HPP_ASSERT( d.getVkHeaderVersion() == VK_HEADER_VERSION );
-    VULKAN_HPP_NAMESPACE::SurfaceKHR surface;
-    Result                           result = static_cast<Result>(
-      d.vkCreateOHOSSurfaceOpenHarmony( m_instance,
-                                        reinterpret_cast<const VkOHOSSurfaceCreateInfoOpenHarmony *>( &createInfo ),
-                                        reinterpret_cast<const VkAllocationCallbacks *>(
-                                        static_cast<const VULKAN_HPP_NAMESPACE::AllocationCallbacks *>( allocator ) ),
-                                   reinterpret_cast<VkSurfaceKHR *>( &surface ) ) );
-    ObjectDestroy<Instance, Dispatch> deleter( *this, allocator, d );
-    return createResultValue<VULKAN_HPP_NAMESPACE::SurfaceKHR, Dispatch>(
-      result, surface, VULKAN_HPP_NAMESPACE_STRING "::Instance::createOHOSSurfaceOpenHarmonyUnique", deleter );
-  }
-#    endif /*VULKAN_HPP_NO_SMART_HANDLE*/
-#  endif   /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
-#endif     /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
-
   //=== VK_EXT_debug_report ===
 
   template <typename Dispatch>

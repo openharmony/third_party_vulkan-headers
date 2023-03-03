@@ -38006,46 +38006,6 @@
         }
       ]
     },
-    "vkCreateOHOSSurfaceOpenHarmony": {
-      "(VK_KHR_surface)+(VK_OpenHarmony_OHOS_surface)": [
-        {
-          "vuid": "VUID-vkCreateOHOSSurfaceOpenHarmony-instance-parameter",
-          "text": " <code>instance</code> <strong class=\"purple\">must</strong> be a valid <a href=\"#VkInstance\">VkInstance</a> handle"
-        },
-        {
-          "vuid": "VUID-vkCreateOHOSSurfaceOpenHarmony-pCreateInfo-parameter",
-          "text": " <code>pCreateInfo</code> <strong class=\"purple\">must</strong> be a valid pointer to a valid <a href=\"#VkOHOSSurfaceCreateInfoOpenHarmony\">VkOHOSSurfaceCreateInfoOpenHarmony</a> structure"
-        },
-        {
-          "vuid": "VUID-vkCreateOHOSSurfaceOpenHarmony-pAllocator-parameter",
-          "text": " If <code>pAllocator</code> is not <code>NULL</code>, <code>pAllocator</code> <strong class=\"purple\">must</strong> be a valid pointer to a valid <a href=\"#VkAllocationCallbacks\">VkAllocationCallbacks</a> structure"
-        },
-        {
-          "vuid": "VUID-vkCreateOHOSSurfaceOpenHarmony-pSurface-parameter",
-          "text": " <code>pSurface</code> <strong class=\"purple\">must</strong> be a valid pointer to a <a href=\"#VkSurfaceKHR\">VkSurfaceKHR</a> handle"
-        }
-      ]
-    },
-    "VkOHOSSurfaceCreateInfoOpenHarmony": {
-      "(VK_KHR_surface)+(VK_OpenHarmony_OHOS_surface)": [
-        {
-          "vuid": "VUID-VkOHOSSurfaceCreateInfoOpenHarmony-window-01248",
-          "text": " <code>window</code> <strong class=\"purple\">must</strong> point to a valid OHOS <code>ANativeWindow</code>"
-        },
-        {
-          "vuid": "VUID-VkOHOSSurfaceCreateInfoOpenHarmony-sType-sType",
-          "text": " <code>sType</code> <strong class=\"purple\">must</strong> be <code>VK_STRUCTURE_TYPE_OHOS_SURFACE_CREATE_INFO_OPENHARMONY</code>"
-        },
-        {
-          "vuid": "VUID-VkOHOSSurfaceCreateInfoOpenHarmony-pNext-pNext",
-          "text": " <code>pNext</code> <strong class=\"purple\">must</strong> be <code>NULL</code>"
-        },
-        {
-          "vuid": "VUID-VkOHOSSurfaceCreateInfoOpenHarmony-flags-zerobitmask",
-          "text": " <code>flags</code> <strong class=\"purple\">must</strong> be <code>0</code>"
-        }
-      ]
-    },
     "vkDestroySurfaceKHR": {
       "(VK_KHR_surface)": [
         {

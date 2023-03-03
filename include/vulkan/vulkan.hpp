@@ -2952,18 +2952,6 @@ namespace VULKAN_HPP_NAMESPACE
     }
 #  endif /*VK_USE_PLATFORM_WIN32_KHR*/
 
-#  if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
-    //=== VK_OpenHarmony_OHOS_surface ===
-
-    VkResult vkCreateOHOSSurfaceOpenHarmony(VkInstance instance,
-                                            const VkOHOSSurfaceCreateInfoOpenHarmony * pCreateInfo,
-                                            const VkAllocationCallbacks * pAllocator, 
-                                            VkSurfaceKHR * pSurface ) const VULKAN_HPP_NOEXCEPT
-    {
-      return ::vkCreateOHOSSurfaceOpenHarmony( instance, pCreateInfo, pAllocator, pSurface );
-    }
-#  endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
-
     //=== VK_EXT_debug_report ===
 
     VkResult vkCreateDebugReportCallbackEXT( VkInstance                                 instance,
@@ -11390,13 +11378,6 @@ namespace VULKAN_HPP_NAMESPACE
     PFN_dummy vkGetPhysicalDeviceWin32PresentationSupportKHR_placeholder    = 0;
 #endif /*VK_USE_PLATFORM_WIN32_KHR*/
 
-#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
-    //=== VK_OpenHarmony_OHOS_surface ===
-    PFN_vkCreateOHOSSurfaceOpenHarmony vkCreateOHOSSurfaceOpenHarmony = 0;
-#else
-    PFN_dummy vkCreateOHOSSurfaceOpenHarmony_placeholder              = 0;
-#endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
-
     //=== VK_EXT_debug_report ===
     PFN_vkCreateDebugReportCallbackEXT  vkCreateDebugReportCallbackEXT  = 0;
     PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = 0;
@@ -12444,12 +12425,6 @@ namespace VULKAN_HPP_NAMESPACE
       vkGetPhysicalDeviceWin32PresentationSupportKHR = PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR(
         vkGetInstanceProcAddr( instance, "vkGetPhysicalDeviceWin32PresentationSupportKHR" ) );
 #endif /*VK_USE_PLATFORM_WIN32_KHR*/
-
-#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
-      //=== VK_OpenHarmony_OHOS_surface ===
-      vkCreateOHOSSurfaceOpenHarmony =
-        PFN_vkCreateOHOSSurfaceOpenHarmony( vkGetInstanceProcAddr( instance, "vkCreateOHOSSurfaceOpenHarmony" ) );
-#endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
 
       //=== VK_EXT_debug_report ===
       vkCreateDebugReportCallbackEXT =
