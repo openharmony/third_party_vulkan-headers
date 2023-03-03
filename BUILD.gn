@@ -13,17 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/vulkan_headers.gni")
+import("//build/ohos.gni")
+
+is_ohos = current_os == "ohos"
+is_android = current_os == "android"
+is_mac = current_os == "ios" || current_os == "tvos" || current_os == "mac"
+is_win = current_os == "win" || current_os == "mingw"
+is_linux = current_os == "linux"
+is_fuchsia = current_os == "fuchsia"
 
 config("vulkan_headers_config") {
   include_dirs = [ "include" ]
   defines = []
 
+  if (is_ohos) {
+    defines += [ "VK_USE_PLATFORM_OHOS_OPENHARMONY" ]
+  }
+
   if (is_win) {
     defines += [ "VK_USE_PLATFORM_WIN32_KHR" ]
   }
-  if (defined(vulkan_use_x11) && vulkan_use_x11) {
-    defines += [ "VK_USE_PLATFORM_XCB_KHR" ]
+  if (is_linux) {
+    if (defined(vulkan_use_x11) && vulkan_use_x11) {
+      defines += [ "VK_USE_PLATFORM_XCB_KHR" ]
+    }
   }
   if (defined(vulkan_use_wayland) && vulkan_use_wayland) {
     defines += [ "VK_USE_PLATFORM_WAYLAND_KHR" ]
@@ -55,8 +68,7 @@ source_set("vulkan_headers") {
     "include/vulkan/vulkan.h",
     "include/vulkan/vulkan.hpp",
     "include/vulkan/vulkan_core.h",
-    "include/vulkan/vulkan_screen.h",
+    "include/vulkan/vulkan_ohos.h",
   ]
   public_configs = [ ":vulkan_headers_config" ]
 }
-

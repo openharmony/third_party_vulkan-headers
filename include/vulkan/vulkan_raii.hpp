@@ -186,6 +186,12 @@ namespace VULKAN_HPP_NAMESPACE
         vkCreateAndroidSurfaceKHR = PFN_vkCreateAndroidSurfaceKHR( vkGetInstanceProcAddr( instance, "vkCreateAndroidSurfaceKHR" ) );
 #  endif /*VK_USE_PLATFORM_ANDROID_KHR*/
 
+#  if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
+        //=== VK_OpenHarmony_OHOS_surface ===
+        vkCreateOHOSSurfaceOpenHarmony =
+          PFN_vkCreateOHOSSurfaceOpenHarmony( vkGetInstanceProcAddr( instance, "vkCreateOHOSSurfaceOpenHarmony" ) );
+#  endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
+
         //=== VK_KHR_device_group ===
         vkGetPhysicalDevicePresentRectanglesKHR =
           PFN_vkGetPhysicalDevicePresentRectanglesKHR( vkGetInstanceProcAddr( instance, "vkGetPhysicalDevicePresentRectanglesKHR" ) );
@@ -487,6 +493,13 @@ namespace VULKAN_HPP_NAMESPACE
 #  else
       PFN_dummy vkCreateAndroidSurfaceKHR_placeholder                         = 0;
 #  endif /*VK_USE_PLATFORM_ANDROID_KHR*/
+
+#  if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
+      //=== VK_OpenHarmony_OHOS_surface ===
+      PFN_vkCreateOHOSSurfaceOpenHarmony vkCreateOHOSSurfaceOpenHarmony = 0;
+#  else
+      PFN_dummy vkCreateOHOSSurfaceOpenHarmony_placeholder                         = 0;
+#  endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
 
       //=== VK_KHR_device_group ===
       PFN_vkGetPhysicalDevicePresentRectanglesKHR vkGetPhysicalDevicePresentRectanglesKHR = 0;
@@ -2660,6 +2673,14 @@ namespace VULKAN_HPP_NAMESPACE
                            createWin32SurfaceKHR( VULKAN_HPP_NAMESPACE::Win32SurfaceCreateInfoKHR const &                         createInfo,
                                                   VULKAN_HPP_NAMESPACE::Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator = nullptr ) const;
 #  endif /*VK_USE_PLATFORM_WIN32_KHR*/
+
+#  if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
+      //=== VK_OpenHarmony_OHOS_surface ===
+
+      VULKAN_HPP_NODISCARD VULKAN_HPP_RAII_NAMESPACE::SurfaceKHR createOHOSSurfaceOpenHarmony(
+        VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony const &                       createInfo,
+        VULKAN_HPP_NAMESPACE::Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator = nullptr ) const;
+#  endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
 
       //=== VK_EXT_debug_report ===
 
@@ -13281,6 +13302,17 @@ namespace VULKAN_HPP_NAMESPACE
       return static_cast<VULKAN_HPP_NAMESPACE::Bool32>( result );
     }
 #  endif /*VK_USE_PLATFORM_WIN32_KHR*/
+
+#  if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
+    //=== VK_OpenHarmony_OHOS_surface ===
+
+    VULKAN_HPP_NODISCARD VULKAN_HPP_INLINE VULKAN_HPP_RAII_NAMESPACE::SurfaceKHR Instance::createOHOSSurfaceOpenHarmony(
+      VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony const &                       createInfo,
+      VULKAN_HPP_NAMESPACE::Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator ) const
+    {
+      return VULKAN_HPP_RAII_NAMESPACE::SurfaceKHR( *this, createInfo, allocator );
+    }
+#  endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
 
     //=== VK_EXT_debug_report ===
 

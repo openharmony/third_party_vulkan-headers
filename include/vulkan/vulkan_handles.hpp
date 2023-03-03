@@ -520,6 +520,11 @@ namespace VULKAN_HPP_NAMESPACE
   struct Win32SurfaceCreateInfoKHR;
 #endif /*VK_USE_PLATFORM_WIN32_KHR*/
 
+#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
+  //=== VK_OpenHarmony_OHOS_surface ===
+  struct OHOSSurfaceCreateInfoOpenHarmony;
+#endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
+
   //=== VK_EXT_debug_report ===
   struct DebugReportCallbackCreateInfoEXT;
 
@@ -13830,6 +13835,34 @@ namespace VULKAN_HPP_NAMESPACE
 #    endif /*VULKAN_HPP_NO_SMART_HANDLE*/
 #  endif   /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 #endif     /*VK_USE_PLATFORM_WIN32_KHR*/
+
+#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
+    //=== VK_OpenHarmony_OHOS_surface ===
+
+    template <typename Dispatch = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    VULKAN_HPP_NODISCARD Result
+      createOHOSSurfaceOpenHarmony( const VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony * pCreateInfo,
+                                    const VULKAN_HPP_NAMESPACE::AllocationCallbacks *         pAllocator,
+                                    VULKAN_HPP_NAMESPACE::SurfaceKHR *                        pSurface,
+                                    Dispatch const & d VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT ) const VULKAN_HPP_NOEXCEPT;
+#  ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    template <typename Dispatch = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    VULKAN_HPP_NODISCARD_WHEN_NO_EXCEPTIONS typename ResultValueType<VULKAN_HPP_NAMESPACE::SurfaceKHR>::type
+      createOHOSSurfaceOpenHarmony( const VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony & createInfo,
+                                    Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator
+                                                  VULKAN_HPP_DEFAULT_ARGUMENT_NULLPTR_ASSIGNMENT,
+                                    Dispatch const & d VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT ) const;
+#    ifndef VULKAN_HPP_NO_SMART_HANDLE
+    template <typename Dispatch = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    VULKAN_HPP_NODISCARD_WHEN_NO_EXCEPTIONS VULKAN_HPP_INLINE
+      typename ResultValueType<UniqueHandle<VULKAN_HPP_NAMESPACE::SurfaceKHR, Dispatch>>::type
+      createOHOSSurfaceOpenHarmonyUnique( const VULKAN_HPP_NAMESPACE::OHOSSurfaceCreateInfoOpenHarmony & createInfo,
+                                          Optional<const VULKAN_HPP_NAMESPACE::AllocationCallbacks> allocator
+                                                        VULKAN_HPP_DEFAULT_ARGUMENT_NULLPTR_ASSIGNMENT,
+                                          Dispatch const & d VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT ) const;
+#    endif /*VULKAN_HPP_NO_SMART_HANDLE*/
+#  endif   /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+#endif     /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
 
     //=== VK_EXT_debug_report ===
 
