@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #define VK_OpenHarmony_OHOS_surface 1
-struct NativeWindow;
+typedef struct NativeWindow OHNativeWindow;
 #define VK_OPENHARMONY_OHOS_SURFACE_SPEC_VERSION 1
 #define VK_OPENHARMONY_OHOS_SURFACE_EXTENSION_NAME "VK_OpenHarmony_OHOS_surface"
 // VK_STRUCTURE_TYPE_OHOS_SURFACE_CREATE_INFO_OPENHARMONY
@@ -27,7 +27,7 @@ typedef struct VkOHOSSurfaceCreateInfoOpenHarmony {
     VkStructureType                   sType;
     const void*                       pNext;
     VkOHOSSurfaceCreateFlagsOpenHarmony    flags;
-    NativeWindow*                   window;
+    OHNativeWindow*                   window;
 } VkOHOSSurfaceCreateInfoOpenHarmony;
 
 typedef VkResult (VKAPI_PTR *PFN_vkCreateOHOSSurfaceOpenHarmony)(VkInstance instance, const VkOHOSSurfaceCreateInfoOpenHarmony* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
