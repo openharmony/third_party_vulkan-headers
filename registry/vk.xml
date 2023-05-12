@@ -20548,8 +20548,8 @@ typedef void* <name>MTLSharedEvent_id</name>;
         </extension>
         <extension name="VK_OpenHarmony_OHOS_surface" number="500" type="instance" requires="VK_KHR_surface" platform="OHOS" author="OpenHarmony" contact="Xindong Shi @stonehwsxd" supported="vulkan">
             <require>
-                <enum value="1"                                           name="VK_OpenHarmony_OHOS_SURFACE_SPEC_VERSION"/>
-                <enum value="&quot;VK_OpenHarmony_OHOS_surface&quot;"     name="VK_OpenHarmony_OHOS_SURFACE_EXTENSION_NAME"/>
+                <enum value="1"                                           name="VK_OPENHARMONY_OHOS_SURFACE_SPEC_VERSION"/>
+                <enum value="&quot;VK_OpenHarmony_OHOS_surface&quot;"     name="VK_OPENHARMONY_OHOS_SURFACE_EXTENSION_NAME"/>
                 <enum offset="0" extends="VkStructureType"                name="VK_STRUCTURE_TYPE_OHOS_SURFACE_CREATE_INFO_OPENHARMONY"/>
                 <type name="VkOHOSSurfaceCreateFlagsOpenHarmony"/>
                 <type name="VkOHOSSurfaceCreateInfoOpenHarmony"/>

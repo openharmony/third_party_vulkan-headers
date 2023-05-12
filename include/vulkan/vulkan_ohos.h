@@ -40,6 +40,80 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateOHOSSurfaceOpenHarmony(
     VkSurfaceKHR*                               pSurface);
 #endif
 
+#define VK_OHOS_native_buffer 1
+
+#define VK_OHOS_NATIVE_BUFFER_SPEC_VERSION 1
+#define VK_OHOS_NATIVE_BUFFER_EXTENSION_NAME "VK_OHOS_native_buffer"
+
+typedef VkFlags VkSwapchainImageUsageFlagsOpenHarmony;
+typedef enum VkSwapchainImageUsageFlagBitsOpenHarmony {
+    VK_SWAPCHAIN_IMAGE_USAGE_SHARED_BIT_OPENHARMONY = 0x00000001,
+    VK_SWAPCHAIN_IMAGE_USAGE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VkSwapchainImageUsageFlagBitsOpenHarmony;
+
+typedef struct {
+    VkStructureType                   sType;
+    const void*                       pNext;
+    BufferHandle*                     handle;
+} VkNativeBufferOpenHarmony;
+
+typedef struct {
+    VkStructureType                   sType;
+    const void*                       pNext;
+    VkSwapchainImageUsageFlagsOpenHarmony    usage;
+} VkSwapchainImageCreateInfoOpenHarmony;
+
+typedef struct {
+    VkStructureType                   sType;
+    const void*                       pNext;
+    VkBool32                          sharedImage;
+} VkPhysicalDevicePresentationPropertiesOpenHarmony;
+
+typedef VkResult (VKAPI_PTR *PFN_vkGetSwapchainGrallocUsageOpenHarmony)(
+    VkDevice                          device,
+    VkFormat                          format,
+    VkImageUsageFlags                 imageUsage,
+    uint64_t*                         grallocUsage);
+
+typedef VkResult (VKAPI_PTR *PFN_vkSetNativeFenceFdOpenHarmony)(
+    VkDevice                          device,
+    int32_t                           nativeFenceFd,
+    VkSemaphore                       semaphore,
+    VkFence                           fence);
+
+typedef VkResult (VKAPI_PTR *PFN_vkGetNativeFenceFdOpenHarmony)(
+    VkQueue                           queue,
+    uint32_t                          waitSemaphoreCount,
+    const VkSemaphore*                pWaitSemaphores,
+    VkImage                           image,
+    int32_t*                          pNativeFenceFd);
+
+#ifndef VK_NO_PROTOTYPES
+
+VKAPI_ATTR VkResult VKAPI_CALL vkGetSwapchainGrallocUsageOpenHarmony(
+    VkDevice                          device,
+    VkFormat                          format,
+    VkImageUsageFlags                 imageUsage,
+    uint64_t*                         grallocUsage
+);
+
+VKAPI_ATTR VkResult VKAPI_CALL vkSetNativeFenceFdOpenHarmony(
+    VkDevice                          device,
+    int32_t                           nativeFenceFd,
+    VkSemaphore                       semaphore,
+    VkFence                           fence
+);
+
+VKAPI_ATTR VkResult VKAPI_CALL vkGetNativeFenceFdOpenHarmony(
+    VkQueue                           queue,
+    uint32_t                          waitSemaphoreCount,
+    const VkSemaphore*                pWaitSemaphores,
+    VkImage                           image,
+    int32_t*                          pNativeFenceFd
+);
+
+#endif
+
 #define VK_OpenHarmony_external_memory_OHOS_native_buffer 1
 struct OH_NativeBuffer;
 #define VK_OPENHARMONY_EXTERNAL_MEMORY_OHOS_NATIVE_BUFFER_SPEC_VERSION 1

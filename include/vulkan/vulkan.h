@@ -85,6 +85,7 @@
 #endif
 
 #ifdef VK_USE_PLATFORM_OHOS_OPENHARMONY
+#include "buffer_handle.h"
 #include "vulkan_ohos.h"
 #endif
 
