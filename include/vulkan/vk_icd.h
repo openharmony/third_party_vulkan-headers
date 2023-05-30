@@ -123,7 +123,7 @@ typedef enum {
     VK_ICD_WSI_PLATFORM_VI,
     VK_ICD_WSI_PLATFORM_GGP,
     VK_ICD_WSI_PLATFORM_SCREEN,
-    VK_ICD_WSI_PLATFORM_OPENHARMONY,
+    VK_ICD_WSI_PLATFORM_OHOS,
 } VkIcdWsiPlatform;
 
 typedef struct {
@@ -243,10 +243,10 @@ typedef struct {
 } VkIcdSurfaceScreen;
 #endif  // VK_USE_PLATFORM_SCREEN_QNX
 
-#ifdef VK_USE_PLATFORM_OHOS_OPENHARMONY
+#ifdef VK_USE_PLATFORM_OHOS
 typedef struct {
     VkIcdSurfaceBase base;
     struct NativeWindow *window;
-} VkIcdSurfaceOpenHarmony;
-#endif  // VK_USE_PLATFORM_OHOS_OPENHARMONY
+} VkIcdSurfaceOHOS;
+#endif  // VK_USE_PLATFORM_OHOS
 #endif  // VKICD_H

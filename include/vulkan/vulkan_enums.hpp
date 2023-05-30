@@ -3078,10 +3078,10 @@ namespace VULKAN_HPP_NAMESPACE
   };
 #endif /*VK_USE_PLATFORM_WIN32_KHR*/
 
-#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
-  //=== VK_OpenHarmony_ohos_surface ===
+#if defined( VK_USE_PLATFORM_OHOS )
+  //=== VK_OHOS_surface ===
 
-  enum class OHOSSurfaceCreateFlagsBitsOpenHarmony : VkOHOSSurfaceCreateFlagsOpenHarmony
+  enum class OHOSSurfaceCreateFlagsBitsOpenHarmony : VkSurfaceCreateFlagsOHOS
   {
   };
 
@@ -3089,7 +3089,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
     return "(void)";
   }
-#endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
+#endif /*VK_USE_PLATFORM_OHOS*/
 
   //=== VK_EXT_debug_report ===
 
@@ -5915,16 +5915,16 @@ namespace VULKAN_HPP_NAMESPACE
   using Win32SurfaceCreateFlagsKHR = Flags<Win32SurfaceCreateFlagBitsKHR>;
 #endif /*VK_USE_PLATFORM_WIN32_KHR*/
 
-#if defined( VK_USE_PLATFORM_OHOS_OPENHARMONY )
-  //=== VK_OpenHarmony_OHOS_surface ===
+#if defined( VK_USE_PLATFORM_OHOS )
+  //=== VK_OHOS_surface ===
 
-  using OHOSSurfaceCreateFlagsOpenHarmony = Flags<OHOSSurfaceCreateFlagsBitsOpenHarmony>;
+  using SurfaceCreateFlagsOHOS = Flags<OHOSSurfaceCreateFlagsBitsOpenHarmony>;
 
-  VULKAN_HPP_INLINE std::string to_string( OHOSSurfaceCreateFlagsOpenHarmony )
+  VULKAN_HPP_INLINE std::string to_string( SurfaceCreateFlagsOHOS )
   {
     return "{}";
   }
-#endif /*VK_USE_PLATFORM_OHOS_OPENHARMONY*/
+#endif /*VK_USE_PLATFORM_OHOS*/
 
   //=== VK_EXT_debug_report ===
 

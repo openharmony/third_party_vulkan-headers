@@ -34,7 +34,7 @@ branch of the member gitlab server.
         <platform name="ggp" protect="VK_USE_PLATFORM_GGP" comment="Google Games Platform"/>
         <platform name="provisional" protect="VK_ENABLE_BETA_EXTENSIONS" comment="Enable declarations for beta/provisional extensions"/>
         <platform name="screen" protect="VK_USE_PLATFORM_SCREEN_QNX" comment="QNX Screen Graphics Subsystem"/>
-        <platform name="OHOS" protect="VK_USE_PLATFORM_OHOS_OPENHARMONY" comment="OpenHarmony Graphics Subsystem"/>
+        <platform name="ohos" protect="VK_USE_PLATFORM_OHOS" comment="OpenHarmony Graphics Subsystem"/>
     </platforms>
 
     <tags comment="Vulkan vendor/author tags for extensions and layers">
@@ -75,8 +75,7 @@ branch of the member gitlab server.
         <tag name="JUICE"       author="Juice Technologies, Inc."      contact="David McCloskey @damcclos, Dean Beeler @canadacow"/>
         <tag name="FB"          author="Facebook, Inc"                 contact="Artem Bolgar @artyom17"/>
         <tag name="RASTERGRID"  author="RasterGrid Kft."               contact="Daniel Rakos @aqnuep1"/>
-        <tag name="OpenHarmony" author="Huawei Technologies Co. Ltd."  contact="Xindong Shi @stonehwsxd"/>
-        <tag name="OpenHarmony" author="Huawei Technologies Co. Ltd."  contact="Zhao Zhang @andrew0229"/>
+        <tag name="OHOS"        author="Huawei Technologies Co. Ltd."  contact="Zhao Zhang @andrew0229"/>
     </tags>
 
     <types comment="Vulkan type definitions">
@@ -91,6 +90,7 @@ branch of the member gitlab server.
         <type category="include" name="xcb/xcb.h"/>
         <type category="include" name="directfb.h"/>
         <type category="include" name="zircon/types.h"/>
+        <type category="include" name="buffer_handle.h"/>
         <type category="include" name="ggp_c/vulkan_types.h"/>
         <type category="include" name="screen/screen.h"/>
             <comment>
@@ -129,6 +129,7 @@ branch of the member gitlab server.
         <type requires="directfb.h" name="IDirectFB"/>
         <type requires="directfb.h" name="IDirectFBSurface"/>
         <type requires="zircon/types.h" name="zx_handle_t"/>
+        <type requires="buffer_handle.h" name="BufferHandle"/>
         <type requires="ggp_c/vulkan_types.h" name="GgpStreamDescriptor"/>
         <type requires="ggp_c/vulkan_types.h" name="GgpFrameToken"/>
         <type requires="screen/screen.h" name="_screen_context"/>
@@ -203,7 +204,7 @@ branch of the member gitlab server.
 
         <type category="basetype">struct <name>ANativeWindow</name>;</type>
         <type category="basetype">struct <name>AHardwareBuffer</name>;</type>
-        <type category="basetype">struct <name>OHNativeWindow</name>;</type>
+        <type category="basetype">typedef struct NativeWindow <name>OHNativeWindow</name>;</type>
         <type category="basetype">struct <name>OH_NativeBuffer</name>;</type>
         <type category="basetype">#ifdef __OBJC__
 @class CAMetalLayer;
@@ -382,7 +383,7 @@ typedef void* <name>MTLSharedEvent_id</name>;
         <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkStreamDescriptorSurfaceCreateFlagsGGP</name>;</type>
         <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkHeadlessSurfaceCreateFlagsEXT</name>;</type>
         <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkScreenSurfaceCreateFlagsQNX</name>;</type>
-        <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkOHOSSurfaceCreateFlagsOpenHarmony</name>;</type>
+        <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkSurfaceCreateFlagsOHOS</name>;</type>
         <type requires="VkPeerMemoryFeatureFlagBits"      category="bitmask">typedef <type>VkFlags</type> <name>VkPeerMemoryFeatureFlags</name>;</type>
         <type                                             category="bitmask" name="VkPeerMemoryFeatureFlagsKHR"               alias="VkPeerMemoryFeatureFlags"/>
         <type requires="VkMemoryAllocateFlagBits"         category="bitmask">typedef <type>VkFlags</type> <name>VkMemoryAllocateFlags</name>;</type>
@@ -485,7 +486,8 @@ typedef void* <name>MTLSharedEvent_id</name>;
         <type requires="VkVideoEncodeH265OutputModeFlagBitsEXT"     category="bitmask">typedef <type>VkFlags</type> <name>VkVideoEncodeH265OutputModeFlagsEXT</name>;</type>
         <type requires="VkVideoEncodeH265CtbSizeFlagBitsEXT"        category="bitmask">typedef <type>VkFlags</type> <name>VkVideoEncodeH265CtbSizeFlagsEXT</name>;</type>
         <type requires="VkVideoEncodeH265TransformBlockSizeFlagBitsEXT"        category="bitmask">typedef <type>VkFlags</type> <name>VkVideoEncodeH265TransformBlockSizeFlagsEXT</name>;</type>
-        <type requires="VkSwapchainImageUsageFlagBitsOpenHarmony" category="bitmask">typedef <type>VkFlags</type> <name>VkSwapchainImageUsageFlagsOpenHarmony</name>;</type>
+        <type requires="VkSwapchainImageUsageFlagBitsOHOS"          category="bitmask">typedef <type>VkFlags</type> <name>VkSwapchainImageUsageFlagsOHOS</name>;</type>
+
             <comment>Types which can be void pointers or class pointers, selected at compile time</comment>
         <type category="handle"                           objtypeenum="VK_OBJECT_TYPE_INSTANCE"><type>VK_DEFINE_HANDLE</type>(<name>VkInstance</name>)</type>
         <type category="handle" parent="VkInstance"       objtypeenum="VK_OBJECT_TYPE_PHYSICAL_DEVICE"><type>VK_DEFINE_HANDLE</type>(<name>VkPhysicalDevice</name>)</type>
@@ -798,7 +800,7 @@ typedef void* <name>MTLSharedEvent_id</name>;
         <type name="VkOpticalFlowSessionCreateFlagBitsNV" category="enum"/>
         <type name="VkOpticalFlowExecuteFlagBitsNV" category="enum"/>
         <type name="VkDeviceFaultAddressTypeEXT" category="enum"/>
-        <type name="VkSwapchainImageUsageFlagBitsOpenHarmony" category="enum"/>
+        <type name="VkSwapchainImageUsageFlagBitsOHOS" category="enum"/>
 
             <comment>Enumerated types in the header, but not used by the API</comment>
         <type name="VkVendorId" category="enum"/>
@@ -2038,11 +2040,11 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <member noautovalidity="true">struct <type>_screen_context</type>*    <name>context</name></member>
             <member noautovalidity="true">struct <type>_screen_window</type>*     <name>window</name></member>
         </type>
-        <type category="struct" name="VkOHOSSurfaceCreateInfoOpenHarmony">
-            <member values="VK_STRUCTURE_TYPE_OHOS_SURFACE_CREATE_INFO_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
+        <type category="struct" name="VkSurfaceCreateInfoOHOS">
+            <member values="VK_STRUCTURE_TYPE_SURFACE_CREATE_INFO_OHOS"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true">const <type>void</type>*                                    <name>pNext</name></member>
-            <member optional="true"><type>VkOHOSSurfaceCreateFlagsOpenHarmony</type> <name>flags</name></member>
-            <member noautovalidity="true">struct <type>OHNativeWindow</type>*    <name>window</name></member>
+            <member optional="true"><type>VkSurfaceCreateFlagsOHOS</type> <name>flags</name></member>
+            <member noautovalidity="true"><type>OHNativeWindow</type>*    <name>window</name></member>
         </type>
         <type category="struct" name="VkSurfaceFormatKHR" returnedonly="true">
             <member><type>VkFormat</type>                         <name>format</name><comment>Supported pair of rendering format</comment></member>
@@ -3480,28 +3482,28 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <member><type>int</type> <name>usage</name></member>
             <member><type>VkNativeBufferUsage2ANDROID</type> <name>usage2</name></member>
         </type>
-        <type category="struct" name="VkNativeBufferOpenHarmony">
-            <member values="VK_STRUCTURE_TYPE_NATIVE_BUFFER_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true">const <type>void</type>* <name>pNext</name></member>
-            <member>const <type>void</type>* <name>handle</name></member>
-        </type>
         <type category="struct" name="VkSwapchainImageCreateInfoANDROID">
             <member values="VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_ANDROID"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true">const <type>void</type>* <name>pNext</name></member>
             <member><type>VkSwapchainImageUsageFlagsANDROID</type> <name>usage</name></member>
-        </type>
-        <type category="struct" name="VkSwapchainImageCreateInfoOpenHarmony">
-            <member values="VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true">const <type>void</type>* <name>pNext</name></member>
-            <member><type>VkSwapchainImageUsageFlagsOpenHarmony</type> <name>usage</name></member>
         </type>
         <type category="struct" name="VkPhysicalDevicePresentationPropertiesANDROID">
             <member values="VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_ANDROID"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true">const <type>void</type>* <name>pNext</name></member>
             <member><type>VkBool32</type> <name>sharedImage</name></member>
         </type>
-        <type category="struct" name="VkPhysicalDevicePresentationPropertiesOpenHarmony">
-            <member values="VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
+        <type category="struct" name="VkNativeBufferOHOS">
+            <member values="VK_STRUCTURE_TYPE_NATIVE_BUFFER_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true">const <type>void</type>* <name>pNext</name></member>
+            <member><type>BufferHandle</type>* <name>handle</name></member>
+        </type>
+        <type category="struct" name="VkSwapchainImageCreateInfoOHOS">
+            <member values="VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true">const <type>void</type>* <name>pNext</name></member>
+            <member><type>VkSwapchainImageUsageFlagsOHOS</type> <name>usage</name></member>
+        </type>
+        <type category="struct" name="VkPhysicalDevicePresentationPropertiesOHOS">
+            <member values="VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_OHOS"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true">const <type>void</type>* <name>pNext</name></member>
             <member><type>VkBool32</type> <name>sharedImage</name></member>
         </type>
@@ -3894,29 +3896,13 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <member optional="true">const <type>void</type>*                        <name>pNext</name></member>
             <member>struct <type>AHardwareBuffer</type>*            <name>buffer</name></member>
         </type>
-        <type category="struct" name="VkImportOHOSNativeBufferInfoOpenHarmony" structextends="VkMemoryAllocateInfo">
-            <member values="VK_STRUCTURE_TYPE_IMPORT_OHOS_NATIVE_BUFFER_INFO_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true">const <type>void</type>*                        <name>pNext</name></member>
-            <member>struct <type>OH_NativeBuffer</type>*            <name>buffer</name></member>
-        </type> 
         <type category="struct" name="VkAndroidHardwareBufferUsageANDROID" structextends="VkImageFormatProperties2" returnedonly="true">
             <member values="VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_USAGE_ANDROID"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true"><type>void</type>*                              <name>pNext</name></member>
             <member><type>uint64_t</type>                           <name>androidHardwareBufferUsage</name></member>
         </type>
-        <type category="struct" name="VkOHOSNativeBufferUsageOpenHarmony" structextends="VkImageFormatProperties2" returnedonly="true">
-            <member values="VK_STRUCTURE_TYPE_OHOS_NATIVE_BUFFER_USAGE_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true"><type>void</type>*                              <name>pNext</name></member>
-            <member><type>uint64_t</type>                           <name>OHOSNativeBufferUsage</name></member>
-        </type>
         <type category="struct" name="VkAndroidHardwareBufferPropertiesANDROID" returnedonly="true">
             <member values="VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_PROPERTIES_ANDROID"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true"><type>void</type>*                              <name>pNext</name></member>
-            <member><type>VkDeviceSize</type>                       <name>allocationSize</name></member>
-            <member><type>uint32_t</type>                           <name>memoryTypeBits</name></member>
-        </type>
-        <type category="struct" name="VkOHOSNativeBufferPropertiesOpenHarmony" returnedonly="true">
-            <member values="VK_STRUCTURE_TYPE_OHOS_NATIVE_BUFFER_PROPERTIES_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true"><type>void</type>*                              <name>pNext</name></member>
             <member><type>VkDeviceSize</type>                       <name>allocationSize</name></member>
             <member><type>uint32_t</type>                           <name>memoryTypeBits</name></member>
@@ -3926,25 +3912,8 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <member optional="true">const <type>void</type>*                        <name>pNext</name></member>
             <member><type>VkDeviceMemory</type>                     <name>memory</name></member>
         </type>
-        <type category="struct" name="VkMemoryGetOHOSNativeBufferInfoOpenHarmony">
-            <member values="VK_STRUCTURE_TYPE_MEMORY_GET_OHOS_NATIVE_BUFFER_INFO_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true">const <type>void</type>*                        <name>pNext</name></member>
-            <member><type>VkDeviceMemory</type>                     <name>memory</name></member>
-        </type>
         <type category="struct" name="VkAndroidHardwareBufferFormatPropertiesANDROID" structextends="VkAndroidHardwareBufferPropertiesANDROID" returnedonly="true">
             <member values="VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_FORMAT_PROPERTIES_ANDROID"><type>VkStructureType</type> <name>sType</name></member>
-            <member optional="true"><type>void</type>*                              <name>pNext</name></member>
-            <member><type>VkFormat</type>                           <name>format</name></member>
-            <member><type>uint64_t</type>                           <name>externalFormat</name></member>
-            <member><type>VkFormatFeatureFlags</type>               <name>formatFeatures</name></member>
-            <member><type>VkComponentMapping</type>                 <name>samplerYcbcrConversionComponents</name></member>
-            <member><type>VkSamplerYcbcrModelConversion</type>      <name>suggestedYcbcrModel</name></member>
-            <member><type>VkSamplerYcbcrRange</type>                <name>suggestedYcbcrRange</name></member>
-            <member><type>VkChromaLocation</type>                   <name>suggestedXChromaOffset</name></member>
-            <member><type>VkChromaLocation</type>                   <name>suggestedYChromaOffset</name></member>
-        </type>
-        <type category="struct" name="VkOHOSNativeBufferFormatPropertiesOpenHarmony" structextends="VkOHOSNativeBufferPropertiesOpenHarmony" returnedonly="true">
-            <member values="VK_STRUCTURE_TYPE_OHOS_NATIVE_BUFFER_FORMAT_PROPERTIES_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true"><type>void</type>*                              <name>pNext</name></member>
             <member><type>VkFormat</type>                           <name>format</name></member>
             <member><type>uint64_t</type>                           <name>externalFormat</name></member>
@@ -3965,8 +3934,41 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <member optional="true"><type>void</type>*                              <name>pNext</name></member>
             <member><type>uint64_t</type>                           <name>externalFormat</name></member>
         </type>
-        <type category="struct" name="VkExternalFormatOpenHarmony" structextends="VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo">
-            <member values="VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_OPENHARMONY"><type>VkStructureType</type> <name>sType</name></member>
+        <type category="struct" name="VkImportNativeBufferInfoOHOS" structextends="VkMemoryAllocateInfo">
+            <member values="VK_STRUCTURE_TYPE_IMPORT_NATIVE_BUFFER_INFO_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true">const <type>void</type>*                        <name>pNext</name></member>
+            <member>struct <type>OH_NativeBuffer</type>*            <name>buffer</name></member>
+        </type>
+        <type category="struct" name="VkNativeBufferUsageOHOS" structextends="VkImageFormatProperties2" returnedonly="true">
+            <member values="VK_STRUCTURE_TYPE_NATIVE_BUFFER_USAGE_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true"><type>void</type>*                              <name>pNext</name></member>
+            <member><type>uint64_t</type>                           <name>OHOSNativeBufferUsage</name></member>
+        </type>
+        <type category="struct" name="VkNativeBufferPropertiesOHOS" returnedonly="true">
+            <member values="VK_STRUCTURE_TYPE_NATIVE_BUFFER_PROPERTIES_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true"><type>void</type>*                              <name>pNext</name></member>
+            <member><type>VkDeviceSize</type>                       <name>allocationSize</name></member>
+            <member><type>uint32_t</type>                           <name>memoryTypeBits</name></member>
+        </type>
+        <type category="struct" name="VkMemoryGetNativeBufferInfoOHOS">
+            <member values="VK_STRUCTURE_TYPE_MEMORY_GET_NATIVE_BUFFER_INFO_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true">const <type>void</type>*                        <name>pNext</name></member>
+            <member><type>VkDeviceMemory</type>                     <name>memory</name></member>
+        </type>
+        <type category="struct" name="VkNativeBufferFormatPropertiesOHOS" structextends="VkNativeBufferPropertiesOHOS" returnedonly="true">
+            <member values="VK_STRUCTURE_TYPE_NATIVE_BUFFER_FORMAT_PROPERTIES_OHOS"><type>VkStructureType</type> <name>sType</name></member>
+            <member optional="true"><type>void</type>*                              <name>pNext</name></member>
+            <member><type>VkFormat</type>                           <name>format</name></member>
+            <member><type>uint64_t</type>                           <name>externalFormat</name></member>
+            <member><type>VkFormatFeatureFlags</type>               <name>formatFeatures</name></member>
+            <member><type>VkComponentMapping</type>                 <name>samplerYcbcrConversionComponents</name></member>
+            <member><type>VkSamplerYcbcrModelConversion</type>      <name>suggestedYcbcrModel</name></member>
+            <member><type>VkSamplerYcbcrRange</type>                <name>suggestedYcbcrRange</name></member>
+            <member><type>VkChromaLocation</type>                   <name>suggestedXChromaOffset</name></member>
+            <member><type>VkChromaLocation</type>                   <name>suggestedYChromaOffset</name></member>
+        </type>
+        <type category="struct" name="VkExternalFormatOHOS" structextends="VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo">
+            <member values="VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_OHOS"><type>VkStructureType</type> <name>sType</name></member>
             <member optional="true"><type>void</type>*                              <name>pNext</name></member>
             <member><type>uint64_t</type>                           <name>externalFormat</name></member>
         </type>
@@ -8398,8 +8400,8 @@ typedef void* <name>MTLSharedEvent_id</name>;
     <enums name="VkSwapchainImageUsageFlagBitsANDROID" type="bitmask">
       <enum bitpos="0"      name="VK_SWAPCHAIN_IMAGE_USAGE_SHARED_BIT_ANDROID"/>
     </enums>
-    <enums name="VkSwapchainImageUsageFlagBitsOpenHarmony" type="bitmask">
-      <enum bitpos="0"      name="VK_SWAPCHAIN_IMAGE_USAGE_SHARED_BIT_OPENHARMONY"/>
+    <enums name="VkSwapchainImageUsageFlagBitsOHOS" type="bitmask">
+      <enum bitpos="0"      name="VK_SWAPCHAIN_IMAGE_USAGE_SHARED_BIT_OHOS"/>
     </enums>
     <enums name="VkTimeDomainEXT" type="enum">
         <enum value="0"     name="VK_TIME_DOMAIN_DEVICE_EXT"/>
@@ -10548,19 +10550,6 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <param optional="true">const <type>VkAllocationCallbacks</type>* <name>pAllocator</name></param>
             <param><type>VkSurfaceKHR</type>* <name>pSurface</name></param>
         </command>
-        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_OUT_OF_DEVICE_MEMORY,VK_ERROR_NATIVE_WINDOW_IN_USE_KHR">
-            <proto><type>VkResult</type> <name>vkCreateOHOSSurfaceOpenHarmony</name></proto>
-            <param><type>VkInstance</type> <name>instance</name></param>
-            <param>const <type>VkOHOSSurfaceCreateInfoOpenHarmony</type>* <name>pCreateInfo</name></param>
-            <param optional="true">const <type>VkAllocationCallbacks</type>* <name>pAllocator</name></param>
-            <param><type>VkSurfaceKHR</type>* <name>pSurface</name></param>
-        </command>
-        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_INVALID_EXTERNAL_HANDLE_KHR">
-            <proto><type>VkResult</type> <name>vkGetOHOSNativeBufferPropertiesOpenHarmony</name></proto>
-            <param><type>VkDevice</type> <name>device</name></param>
-            <param>const struct <type>OH_NativeBuffer</type>* <name>buffer</name></param>
-            <param><type>VkOHOSNativeBufferPropertiesOpenHarmony</type>* <name>pProperties</name></param>
-        </command>
         <command successcodes="VK_SUCCESS,VK_INCOMPLETE" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_OUT_OF_DEVICE_MEMORY">
             <proto><type>VkResult</type> <name>vkGetPhysicalDeviceDisplayPropertiesKHR</name></proto>
             <param><type>VkPhysicalDevice</type> <name>physicalDevice</name></param>
@@ -11452,13 +11441,6 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <param><type>int</type>* <name>grallocUsage</name></param>
         </command>
         <command>
-            <proto><type>VkResult</type> <name>vkGetSwapchainGrallocUsageOpenHarmony</name></proto>
-            <param><type>VkDevice</type> <name>device</name></param>
-            <param><type>VkFormat</type> <name>format</name></param>
-            <param><type>VkImageUsageFlags</type> <name>imageUsage</name></param>
-            <param><type>int</type>* <name>grallocUsage</name></param>
-        </command>
-        <command>
             <proto><type>VkResult</type> <name>vkGetSwapchainGrallocUsage2ANDROID</name></proto>
             <param><type>VkDevice</type> <name>device</name></param>
             <param><type>VkFormat</type> <name>format</name></param>
@@ -11476,13 +11458,6 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <param><type>VkFence</type> <name>fence</name></param>
         </command>
         <command>
-            <proto><type>VkResult</type> <name>vkSetNativeFenceFdOpenHarmony</name></proto>
-            <param><type>VkDevice</type> <name>device</name></param>
-            <param><type>int32_t</type> <name>nativeFenceFd</name></param>
-            <param><type>VkSemaphore</type> <name>semaphore</name></param>
-            <param><type>VkFence</type> <name>fence</name></param>
-        </command>
-        <command>
             <proto><type>VkResult</type> <name>vkQueueSignalReleaseImageANDROID</name></proto>
             <param><type>VkQueue</type> <name>queue</name></param>
             <param><type>uint32_t</type> <name>waitSemaphoreCount</name></param>
@@ -11490,8 +11465,42 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <param><type>VkImage</type> <name>image</name></param>
             <param><type>int</type>* <name>pNativeFenceFd</name></param>
         </command>
-        <command>
-            <proto><type>VkResult</type> <name>vkGetNativeFenceFdOpenHarmony</name></proto>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_OUT_OF_DEVICE_MEMORY,VK_ERROR_NATIVE_WINDOW_IN_USE_KHR">
+            <proto><type>VkResult</type> <name>vkCreateSurfaceOHOS</name></proto>
+            <param><type>VkInstance</type> <name>instance</name></param>
+            <param>const <type>VkSurfaceCreateInfoOHOS</type>* <name>pCreateInfo</name></param>
+            <param optional="true">const <type>VkAllocationCallbacks</type>* <name>pAllocator</name></param>
+            <param><type>VkSurfaceKHR</type>* <name>pSurface</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_INVALID_EXTERNAL_HANDLE_KHR">
+            <proto><type>VkResult</type> <name>vkGetNativeBufferPropertiesOHOS</name></proto>
+            <param><type>VkDevice</type> <name>device</name></param>
+            <param>const struct <type>OH_NativeBuffer</type>* <name>buffer</name></param>
+            <param><type>VkNativeBufferPropertiesOHOS</type>* <name>pProperties</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_TOO_MANY_OBJECTS,VK_ERROR_OUT_OF_HOST_MEMORY">
+            <proto><type>VkResult</type> <name>vkGetMemoryNativeBufferOHOS</name></proto>
+            <param><type>VkDevice</type> <name>device</name></param>
+            <param>const <type>VkMemoryGetNativeBufferInfoOHOS</type>* <name>pInfo</name></param>
+            <param>struct <type>OH_NativeBuffer</type>** <name>pBuffer</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS">
+            <proto><type>VkResult</type> <name>vkGetSwapchainGrallocUsageOHOS</name></proto>
+            <param><type>VkDevice</type> <name>device</name></param>
+            <param><type>VkFormat</type> <name>format</name></param>
+            <param><type>VkImageUsageFlags</type> <name>imageUsage</name></param>
+            <param><type>uint64_t</type>* <name>grallocUsage</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_TIMEOUT,VK_ERROR_INITIALIZATION_FAILED">
+            <proto><type>VkResult</type> <name>vkAcquireImageOHOS</name></proto>
+            <param><type>VkDevice</type> <name>device</name></param>
+            <param><type>VkImage</type> <name>image</name></param>
+            <param><type>int32_t</type> <name>nativeFenceFd</name></param>
+            <param><type>VkSemaphore</type> <name>semaphore</name></param>
+            <param><type>VkFence</type> <name>fence</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_TIMEOUT,VK_ERROR_INITIALIZATION_FAILED">
+            <proto><type>VkResult</type> <name>vkQueueSignalReleaseImageOHOS</name></proto>
             <param><type>VkQueue</type> <name>queue</name></param>
             <param><type>uint32_t</type> <name>waitSemaphoreCount</name></param>
             <param len="waitSemaphoreCount">const <type>VkSemaphore</type>* <name>pWaitSemaphores</name></param>
@@ -11659,12 +11668,6 @@ typedef void* <name>MTLSharedEvent_id</name>;
             <param><type>VkDevice</type> <name>device</name></param>
             <param>const <type>VkMemoryGetAndroidHardwareBufferInfoANDROID</type>* <name>pInfo</name></param>
             <param>struct <type>AHardwareBuffer</type>** <name>pBuffer</name></param>
-        </command>
-        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_TOO_MANY_OBJECTS,VK_ERROR_OUT_OF_HOST_MEMORY">
-            <proto><type>VkResult</type> <name>vkGetMemoryOHOSNativeBufferOpenHarmony</name></proto>
-            <param><type>VkDevice</type> <name>device</name></param>
-            <param>const <type>VkMemoryGetOHOSNativeBufferInfoOpenHarmony</type>* <name>pInfo</name></param>
-            <param>struct <type>OH_NativeBuffer</type>** <name>pBuffer</name></param>
         </command>
         <command queues="graphics" renderpass="inside" cmdbufferlevel="primary,secondary" tasks="action">
             <proto><type>void</type> <name>vkCmdDrawIndirectCount</name></proto>
@@ -20546,54 +20549,54 @@ typedef void* <name>MTLSharedEvent_id</name>;
                 <enum value="&quot;VK_EXT_extension_499&quot;"              name="VK_EXT_EXTENSION_499_EXTENSION_NAME"/>
             </require>
         </extension>
-        <extension name="VK_OpenHarmony_OHOS_surface" number="500" type="instance" requires="VK_KHR_surface" platform="OHOS" author="OpenHarmony" contact="Xindong Shi @stonehwsxd" supported="vulkan">
+        <extension name="VK_OHOS_surface" number="532" type="instance" requires="VK_KHR_surface" platform="ohos" author="OHOS" contact="Xindong Shi @stonehwsxd" supported="vulkan">
             <require>
-                <enum value="1"                                           name="VK_OPENHARMONY_OHOS_SURFACE_SPEC_VERSION"/>
-                <enum value="&quot;VK_OpenHarmony_OHOS_surface&quot;"     name="VK_OPENHARMONY_OHOS_SURFACE_EXTENSION_NAME"/>
-                <enum offset="0" extends="VkStructureType"                name="VK_STRUCTURE_TYPE_OHOS_SURFACE_CREATE_INFO_OPENHARMONY"/>
-                <type name="VkOHOSSurfaceCreateFlagsOpenHarmony"/>
-                <type name="VkOHOSSurfaceCreateInfoOpenHarmony"/>
-                <command name="vkCreateOHOSSurfaceOpenHarmony"/>
+                <enum value="1"                                           name="VK_OHOS_SURFACE_SPEC_VERSION"/>
+                <enum value="&quot;VK_OHOS_surface&quot;"                 name="VK_OHOS_SURFACE_EXTENSION_NAME"/>
+                <enum offset="0" extends="VkStructureType"                name="VK_STRUCTURE_TYPE_SURFACE_CREATE_INFO_OHOS"/>
+                <type name="VkSurfaceCreateFlagsOHOS"/>
+                <type name="VkSurfaceCreateInfoOHOS"/>
+                <command name="vkCreateSurfaceOHOS"/>
             </require>
         </extension>
-        <extension name="VK_OpenHarmony_external_memory_OHOS_native_buffer" number="501" type="device" author="OpenHarmony" requires="VK_KHR_sampler_ycbcr_conversion,VK_KHR_external_memory,VK_EXT_queue_family_foreign,VK_KHR_dedicated_allocation" platform="OHOS" contact="Zhao Zhang @andrew0229" supported="vulkan">
-            <require>
-                <enum value="1"                                                             name="VK_OPENHARMONY_EXTERNAL_MEMORY_OHOS_NATIVE_BUFFER_SPEC_VERSION"/>
-                <enum value="&quot;VK_OpenHarmony_external_memory_OHOS_native_buffer&quot;" name="VK_OPENHARMONY_EXTERNAL_MEMORY_OHOS_NATIVE_BUFFER_EXTENSION_NAME"/>
-                <enum bitpos="14" extends="VkExternalMemoryHandleTypeFlagBits"              name="VK_EXTERNAL_MEMORY_HANDLE_TYPE_OHOS_NATIVE_BUFFER_BIT_OPENHARMONY"/>
-                <enum offset="0" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_OHOS_NATIVE_BUFFER_USAGE_OPENHARMONY"/>
-                <enum offset="1" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_OHOS_NATIVE_BUFFER_PROPERTIES_OPENHARMONY"/>
-                <enum offset="2" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_OHOS_NATIVE_BUFFER_FORMAT_PROPERTIES_OPENHARMONY"/>
-                <enum offset="3" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_IMPORT_OHOS_NATIVE_BUFFER_INFO_OPENHARMONY"/>
-                <enum offset="4" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_MEMORY_GET_OHOS_NATIVE_BUFFER_INFO_OPENHARMONY"/>
-                <enum offset="5" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_OPENHARMONY"/>
-                <type name="VkOHOSNativeBufferUsageOpenHarmony"/>
-                <type name="VkOHOSNativeBufferPropertiesOpenHarmony"/>
-                <type name="VkOHOSNativeBufferFormatPropertiesOpenHarmony"/>
-                <type name="VkImportOHOSNativeBufferInfoOpenHarmony"/>
-                <type name="VkMemoryGetOHOSNativeBufferInfoOpenHarmony"/>
-                <type name="VkExternalFormatOpenHarmony"/>
-                <command name="vkGetOHOSNativeBufferPropertiesOpenHarmony"/>
-                <command name="vkGetMemoryOHOSNativeBufferOpenHarmony"/>
-                <type name="OH_NativeBuffer"/>
-            </require>
-        </extension>
-        <extension name="VK_OHOS_native_buffer" number="502" type="device" author="OpenHarmony" platform="OHOS" contact="Zhao Zhang @andrew0229" supported="disabled">
+        <extension name="VK_OHOS_native_buffer" number="533" type="device" author="OHOS" platform="ohos" contact="Zhao Zhang @andrew0229" supported="vulkan">
             <require>
                 <comment>VK_OHOS_native_buffer is used between the OpenharmonyOS Vulkan loader and drivers to implement the WSI extensions.</comment>
                 <enum value="1"                                                 name="VK_OHOS_NATIVE_BUFFER_SPEC_VERSION"/>
                 <enum value="&quot;VK_OHOS_native_buffer&quot;"                 name="VK_OHOS_NATIVE_BUFFER_EXTENSION_NAME"/>
-                <enum offset="0" extends="VkStructureType"                      name="VK_STRUCTURE_TYPE_NATIVE_BUFFER_OPENHARMONY"/>
-                <enum offset="1" extends="VkStructureType"                      name="VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_OPENHARMONY"/>
-                <enum offset="2" extends="VkStructureType"                      name="VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_OPENHARMONY"/>
-                <type name="VkNativeBufferOpenHarmony"/>
-                <type name="VkSwapchainImageCreateInfoOpenHarmony"/>
-                <type name="VkPhysicalDevicePresentationPropertiesOpenHarmony"/>
-                <type name="VkSwapchainImageUsageFlagBitsOpenHarmony"/>
-                <type name="VkSwapchainImageUsageFlagsOpenHarmony"/>
-                <command name="vkGetSwapchainGrallocUsageOpenHarmony"/>
-                <command name="vkAcquireImageOpenHarmony"/>
-                <command name="vkQueueSignalReleaseImageOpenHarmony"/>
+                <enum offset="0" extends="VkStructureType"                      name="VK_STRUCTURE_TYPE_NATIVE_BUFFER_OHOS"/>
+                <enum offset="1" extends="VkStructureType"                      name="VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_OHOS"/>
+                <enum offset="2" extends="VkStructureType"                      name="VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_OHOS"/>
+                <type name="VkNativeBufferOHOS"/>
+                <type name="VkSwapchainImageCreateInfoOHOS"/>
+                <type name="VkPhysicalDevicePresentationPropertiesOHOS"/>
+                <type name="VkSwapchainImageUsageFlagBitsOHOS"/>
+                <type name="VkSwapchainImageUsageFlagsOHOS"/>
+                <command name="vkGetSwapchainGrallocUsageOHOS"/>
+                <command name="vkAcquireImageOHOS"/>
+                <command name="vkQueueSignalReleaseImageOHOS"/>
+            </require>
+        </extension>
+        <extension name="VK_OHOS_external_memory" number="534" type="device" author="OHOS" requires="VK_KHR_sampler_ycbcr_conversion,VK_KHR_external_memory,VK_EXT_queue_family_foreign,VK_KHR_dedicated_allocation" platform="ohos" contact="Zhao Zhang @andrew0229" supported="vulkan">
+            <require>
+                <enum value="1"                                                             name="VK_OHOS_EXTERNAL_MEMORY_SPEC_VERSION"/>
+                <enum value="&quot;VK_OHOS_external_memory&quot;"                           name="VK_OHOS_EXTERNAL_MEMORY_EXTENSION_NAME"/>
+                <enum bitpos="14" extends="VkExternalMemoryHandleTypeFlagBits"              name="VK_EXTERNAL_MEMORY_HANDLE_TYPE_OHOS_NATIVE_BUFFER_BIT_OHOS"/>
+                <enum offset="0" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_NATIVE_BUFFER_USAGE_OHOS"/>
+                <enum offset="1" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_NATIVE_BUFFER_PROPERTIES_OHOS"/>
+                <enum offset="2" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_NATIVE_BUFFER_FORMAT_PROPERTIES_OHOS"/>
+                <enum offset="3" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_IMPORT_NATIVE_BUFFER_INFO_OHOS"/>
+                <enum offset="4" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_MEMORY_GET_NATIVE_BUFFER_INFO_OHOS"/>
+                <enum offset="5" extends="VkStructureType"                                  name="VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_OHOS"/>
+                <type name="VkNativeBufferUsageOHOS"/>
+                <type name="VkNativeBufferPropertiesOHOS"/>
+                <type name="VkNativeBufferFormatPropertiesOHOS"/>
+                <type name="VkImportNativeBufferInfoOHOS"/>
+                <type name="VkMemoryGetNativeBufferInfoOHOS"/>
+                <type name="VkExternalFormatOHOS"/>
+                <command name="vkGetNativeBufferPropertiesOHOS"/>
+                <command name="vkGetMemoryNativeBufferOHOS"/>
+                <type name="OH_NativeBuffer"/>
             </require>
         </extension>
     </extensions>
