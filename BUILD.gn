@@ -27,7 +27,7 @@ config("vulkan_headers_config") {
   defines = []
 
   if (is_ohos) {
-    defines += [ "VK_USE_PLATFORM_OHOS_OPENHARMONY" ]
+    defines += [ "VK_USE_PLATFORM_OHOS" ]
   }
 
   if (is_win) {

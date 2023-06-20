@@ -22,23 +22,23 @@ Vulkan Loader 会提供标准 Vulkan API 函数符号、OpenHarmony WSI扩展的
 Vulkan-Loader成功加载Vulkan驱动程序的必要条件
     1.要参考[LoaderDriverInterface](https://gitee.com/openharmony/third_party_vulkan-loader/blob/master/docs/LoaderDriverInterface.md)实现对应的接口;
     2.提供驱动程序描述json文件，参考[加载GPU驱动](https://gitee.com/openharmony/third_party_vulkan-loader/blob/master/README_OpenHarmony.md#%E5%8A%A0%E8%BD%BDgpu%E9%A9%B1%E5%8A%A8);
-    3.实现OpenHarmony平台的扩展包括`VK_OHOS_native_buffer`和`VK_OpenHarmony_external_memory_OHOS_native_buffer`扩展。
+    3.实现OpenHarmony平台的扩展包括`VK_OHOS_native_buffer`和`VK_OHOS_external_memory`扩展。
 
 
 ## 北向应用开发者
 
-### VK_OpenHarmony_OHOS_surface 扩展
+### VK_OHOS_surface 扩展
 
-    接口：vkCreateOHOSSurfaceOpenHarmony
-    VkResult vkCreateOHOSSurfaceOpenHarmony(
+    接口：vkCreateSurfaceOHOS
+    VkResult vkCreateSurfaceOHOS(
         VkInstance                               instance,
-        const VkOHOSSurfaceCreateInfoOpenHarmony pCreateInfo, 
+        const VkSurfaceCreateInfoOHOS            pCreateInfo, 
         const VkAllocationCallbacks              pAllocator,
         VkSurfaceKHR                             pSurface)
 
     参数：
         instance是要关联Surface的实例。
-        pCreateInfo是一个指向结构的指针，该VkOHOSSurfaceCreateInfoOpenHarmony 结构包含影响表面对象创建的参数。
+        pCreateInfo是一个指向结构的指针，该VkSurfaceCreateInfoOHOS 结构包含影响表面对象创建的参数。
         pAllocator是用于在没有更多特定内存分配器可用时做为Surface对象分配的分配器。
         pSurface是一个指向VkSurfaceKHR句柄的指针，在该句柄中返回创建的Surface对象。
 
