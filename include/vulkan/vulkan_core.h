@@ -1230,10 +1230,6 @@ typedef enum VkStructureType {
     VK_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } VkStructureType;
 
-typedef enum VkStructureTypeHUAWEI {
-    VK_STRUCTURE_TYPE_RENDER_PASS_DAMAGE_REGION_BEGIN_INFO_TYPE = VK_STRUCTURE_TYPE_MAX_ENUM - 7
-} VkstructureTypeHUAWEI;
-
 typedef enum VkPipelineCacheHeaderVersion {
     VK_PIPELINE_CACHE_HEADER_VERSION_ONE = 1,
     VK_PIPELINE_CACHE_HEADER_VERSION_MAX_ENUM = 0x7FFFFFFF
@@ -3768,13 +3764,6 @@ typedef struct VkRenderPassCreateInfo {
     uint32_t                          dependencyCount;
     const VkSubpassDependency*        pDependencies;
 } VkRenderPassCreateInfo;
-
-typedef struct VkRenderPassDamageRegionBeginInfo {
-    enum VkStructureTypeHUAWEI  sType;
-    const void*                 pNext;
-    uint32_t                    regionCount;
-    const VkRect2D*             regions;
-} VkRenderPassDamageRegionBeginInfo;
 
 typedef struct VkCommandPoolCreateInfo {
     VkStructureType             sType;
