@@ -9073,13 +9073,16 @@ namespace VULKAN_HPP_NAMESPACE
   {
     VULKAN_HPP_ASSERT( d.getVkHeaderVersion() == VK_HEADER_VERSION );
     VULKAN_HPP_NAMESPACE::SurfaceKHR surface;
-    Result                           result = static_cast<Result>(
-      d.vkCreateSurfaceOHOS( m_instance,
-                                        reinterpret_cast<const VkSurfaceCreateInfoOHOS *>( &createInfo ),
-                                        reinterpret_cast<const VkAllocationCallbacks *>(
-                                        static_cast<const VULKAN_HPP_NAMESPACE::AllocationCallbacks *>( allocator ) ),
-                                        reinterpret_cast<VkSurfaceKHR *>( &surface ) ) );
-    return createResultValue( result, surface, VULKAN_HPP_NAMESPACE_STRING "::Instance::createSurfaceOHOS" );
+    VkResult                         result = d.vkCreateSurfaceOHOS(
+      m_instance,
+      reinterpret_cast<const VkSurfaceCreateInfoOHOS *>( &createInfo ),
+      reinterpret_cast<const VkAllocationCallbacks *>(
+      static_cast<const VULKAN_HPP_NAMESPACE::AllocationCallbacks *>( allocator ) ),
+      reinterpret_cast<VkSurfaceKHR *>( &surface ) );
+    resultCheck( static_cast<VULKAN_HPP_NAMESPACE::Result>( result ),
+                VULKAN_HPP_NAMESPACE_STRING "::Instance::createSurfaceOHOS" );
+
+    return createResultValueType( static_cast<VULKAN_HPP_NAMESPACE::Result>( result ), surface );
   }
 
 #    ifndef VULKAN_HPP_NO_SMART_HANDLE
@@ -9092,15 +9095,19 @@ namespace VULKAN_HPP_NAMESPACE
   {
     VULKAN_HPP_ASSERT( d.getVkHeaderVersion() == VK_HEADER_VERSION );
     VULKAN_HPP_NAMESPACE::SurfaceKHR surface;
-    Result                           result = static_cast<Result>(
-      d.vkCreateSurfaceOHOS( m_instance,
-                                        reinterpret_cast<const VkSurfaceCreateInfoOHOS *>( &createInfo ),
-                                        reinterpret_cast<const VkAllocationCallbacks *>(
-                                        static_cast<const VULKAN_HPP_NAMESPACE::AllocationCallbacks *>( allocator ) ),
-                                   reinterpret_cast<VkSurfaceKHR *>( &surface ) ) );
-    ObjectDestroy<Instance, Dispatch> deleter( *this, allocator, d );
-    return createResultValue<VULKAN_HPP_NAMESPACE::SurfaceKHR, Dispatch>(
-      result, surface, VULKAN_HPP_NAMESPACE_STRING "::Instance::createSurfaceOHOSUnique", deleter );
+    VkResult                         result = d.vkCreateSurfaceOHOS(
+      m_instance,
+      reinterpret_cast<const VkSurfaceCreateInfoOHOS *>( &createInfo ),
+      reinterpret_cast<const VkAllocationCallbacks *>(
+      static_cast<const VULKAN_HPP_NAMESPACE::AllocationCallbacks *>( allocator ) ),
+      reinterpret_cast<VkSurfaceKHR *>( &surface ) );
+    resultCheck( static_cast<VULKAN_HPP_NAMESPACE::Result>( result ),
+                VULKAN_HPP_NAMESPACE_STRING "::Instance::createSurfaceOHOSUnique" );
+
+    return createResultValueType(
+      static_cast<VULKAN_HPP_NAMESPACE::Result>( result ),
+      UniqueHandle<VULKAN_HPP_NAMESPACE::SurfaceKHR, Dispatch>(
+        surface, ObjectDestroy<Instance, Dispatch>( *this, allocator, d ) ) );
   }
 #    endif /*VULKAN_HPP_NO_SMART_HANDLE*/
 #  endif   /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
