@@ -26,9 +26,20 @@
             "third_party": []
         },
         "build": {
-            "sub_component": [],
-            "inner_kits": [],
-            "test": []
+            "sub_component": [
+              "//third_party/vulkan-headers:vulkan_headers"
+            ],
+            "inner_kits": [
+              {
+                "type": "none",
+                "name": "//third_party/vulkan-headers:vulkan_headers",
+                "header": {
+                  "header_files": [
+                  ],
+                  "header_base": "//third_party/vulkan-headers/include"
+                }
+              }
+            ]
         }
     }
 }
