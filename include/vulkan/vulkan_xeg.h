@@ -22,15 +22,17 @@
 extern "C" {
 #endif
 
-typedef PFN_vkVoidFunction (VKAPI_PTR *PFN_HMS_XEG_GetPerFrameLoad)(uint32_t commandBufferCount, const VkCommandBuffer* pCommandBuffers, uint64_t* val);
-VKAPI_ATTR void VKAPI_CALL HMS_XEG_GetPerFrameLoad(
+typedef PFN_vkVoidFunction (VKAPI_PTR *PFN_vkGetPerFrameLoad)(uint32_t commandBufferCount,
+                                                              const VkCommandBuffer* pCommandBuffers,
+                                                              uint64_t* val);
+VKAPI_ATTR void VKAPI_CALL vkGetPerFrameLoad(
     uint32_t                                    commandBufferCount,
     const VkCommandBuffer*                      pCommandBuffers,
     uint64_t*                                   val
 );
 
-typedef PFN_vkVoidFunction (VKAPI_PTR *PFN_HMS_XEG_SetFreqAdjustEnable)(bool enable);
-VKAPI_ATTR void VKAPI_CALL HMS_XEG_SetFreqAdjustEnable(
+typedef PFN_vkVoidFunction (VKAPI_PTR *PFN_vkSetFreqAdjustEnable)(bool enable);
+VKAPI_ATTR void VKAPI_CALL vkSetFreqAdjustEnable(
     bool                                    enable
 );
 
