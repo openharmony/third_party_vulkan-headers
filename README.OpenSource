@@ -1,6 +1,6 @@
 [
     {
-        "Name": "Vulkan",
+        "Name": "Khronos Group - Vulkan",
         "License": "Apache-2.0",
         "License File": "LICENSE.txt",
         "Version Number": "v1.3.275",
