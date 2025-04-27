@@ -1,4 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 //
@@ -8,11 +8,8 @@
 #ifndef VULKAN_SHARED_HPP
 #define VULKAN_SHARED_HPP
 
+#include <atomic>  // std::atomic_size_t
 #include <vulkan/vulkan.hpp>
-
-#if !( defined( VULKAN_HPP_ENABLE_STD_MODULE ) && defined( VULKAN_HPP_STD_MODULE ) )
-#  include <atomic>  // std::atomic_size_t
-#endif
 
 namespace VULKAN_HPP_NAMESPACE
 {
@@ -53,28 +50,6 @@ namespace VULKAN_HPP_NAMESPACE
   template <class HandleType>
   struct HasDestructor : std::integral_constant<bool, !std::is_same<DestructorTypeOf<HandleType>, NoDestructor>::value>
   {
-  };
-
-  template <typename HandleType, typename = void>
-  struct HasPoolType : std::false_type
-  {
-  };
-
-  template <typename HandleType>
-  struct HasPoolType<HandleType, decltype( (void)typename SharedHandleTraits<HandleType>::deleter::PoolTypeExport() )> : std::true_type
-  {
-  };
-
-  template <typename HandleType, typename Enable = void>
-  struct GetPoolType
-  {
-    using type = NoDestructor;
-  };
-
-  template <typename HandleType>
-  struct GetPoolType<HandleType, typename std::enable_if<HasPoolType<HandleType>::value>::type>
-  {
-    using type = typename SharedHandleTraits<HandleType>::deleter::PoolTypeExport;
   };
 
   //=====================================================================================================================
@@ -207,13 +182,6 @@ namespace VULKAN_HPP_NAMESPACE
       return bool( m_handle );
     }
 
-#  if defined( VULKAN_HPP_SMART_HANDLE_IMPLICIT_CAST )
-    operator HandleType() const VULKAN_HPP_NOEXCEPT
-    {
-      return m_handle;
-    }
-#  endif
-
     const HandleType * operator->() const VULKAN_HPP_NOEXCEPT
     {
       return &m_handle;
@@ -282,20 +250,9 @@ namespace VULKAN_HPP_NAMESPACE
   public:
     SharedHandle() = default;
 
-    template <typename T = HandleType, typename = typename std::enable_if<HasDestructor<T>::value && !HasPoolType<T>::value>::type>
+    template <typename T = HandleType, typename = typename std::enable_if<HasDestructor<T>::value>::type>
     explicit SharedHandle( HandleType handle, SharedHandle<DestructorTypeOf<HandleType>> parent, DeleterType deleter = DeleterType() ) VULKAN_HPP_NOEXCEPT
       : BaseType( handle, std::move( parent ), std::move( deleter ) )
-    {
-    }
-
-    template <typename Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE,
-              typename T          = HandleType,
-              typename            = typename std::enable_if<HasDestructor<T>::value && HasPoolType<T>::value>::type>
-    explicit SharedHandle( HandleType                                           handle,
-                           SharedHandle<DestructorTypeOf<HandleType>>           parent,
-                           SharedHandle<typename GetPoolType<HandleType>::type> pool,
-                           const Dispatcher & dispatch                          VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT ) VULKAN_HPP_NOEXCEPT
-      : BaseType( handle, std::move( parent ), DeleterType{ std::move( pool ), dispatch } )
     {
     }
 
@@ -308,165 +265,156 @@ namespace VULKAN_HPP_NAMESPACE
     using BaseType::internalDestroy;
   };
 
-  namespace detail
-  {
+  template <typename HandleType>
+  class SharedHandleTraits;
 
 // Silence the function cast warnings.
 #  if defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __INTEL_COMPILER )
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wcast-function-type"
-#  elif defined( __clang__ ) && ( __clang_major__ >= 13 ) && !defined( __INTEL_COMPILER )
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wcast-function-type"
 #  endif
 
-    template <typename HandleType>
-    class ObjectDestroyShared
+  template <typename HandleType>
+  class ObjectDestroyShared
+  {
+  public:
+    using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
+
+    template <class Dispatcher>
+    using DestroyFunctionPointerType =
+      typename std::conditional<HasDestructor<HandleType>::value,
+                                void ( DestructorType::* )( HandleType, const AllocationCallbacks *, const Dispatcher & ) const,
+                                void ( HandleType::* )( const AllocationCallbacks *, const Dispatcher & ) const>::type;
+
+    using SelectorType = typename std::conditional<HasDestructor<HandleType>::value, DestructorType, HandleType>::type;
+
+    template <typename Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    ObjectDestroyShared( Optional<const AllocationCallbacks> allocationCallbacks VULKAN_HPP_DEFAULT_ARGUMENT_NULLPTR_ASSIGNMENT,
+                         const Dispatcher & dispatch                             VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
+      : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &SelectorType::destroy ) ) )
+      , m_dispatch( &dispatch )
+      , m_allocationCallbacks( allocationCallbacks )
     {
-    public:
-      using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
+    }
 
-      template <class Dispatcher>
-      using DestroyFunctionPointerType =
-        typename std::conditional<HasDestructor<HandleType>::value,
-                                  void ( DestructorType::* )( HandleType, const AllocationCallbacks *, const Dispatcher & ) const,
-                                  void ( HandleType::* )( const AllocationCallbacks *, const Dispatcher & ) const>::type;
-
-      using SelectorType = typename std::conditional<HasDestructor<HandleType>::value, DestructorType, HandleType>::type;
-
-      template <typename Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
-      ObjectDestroyShared( Optional<const AllocationCallbacks> allocationCallbacks VULKAN_HPP_DEFAULT_ARGUMENT_NULLPTR_ASSIGNMENT,
-                           const Dispatcher & dispatch                             VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
-        : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &SelectorType::destroy ) ) )
-        , m_dispatch( &dispatch )
-        , m_allocationCallbacks( allocationCallbacks )
-      {
-      }
-
-    public:
-      template <typename T = HandleType>
-      typename std::enable_if<HasDestructor<T>::value, void>::type destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
-      {
-        VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
-        ( parent.*m_destroy )( handle, m_allocationCallbacks, *m_dispatch );
-      }
-
-      template <typename T = HandleType>
-      typename std::enable_if<!HasDestructor<T>::value, void>::type destroy( HandleType handle ) const VULKAN_HPP_NOEXCEPT
-      {
-        VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
-        ( handle.*m_destroy )( m_allocationCallbacks, *m_dispatch );
-      }
-
-    private:
-      DestroyFunctionPointerType<detail::DispatchLoaderBase> m_destroy             = nullptr;
-      const detail::DispatchLoaderBase *                     m_dispatch            = nullptr;
-      Optional<const AllocationCallbacks>                    m_allocationCallbacks = nullptr;
-    };
-
-    template <typename HandleType>
-    class ObjectFreeShared
+  public:
+    template <typename T = HandleType>
+    typename std::enable_if<HasDestructor<T>::value, void>::type destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
     {
-    public:
-      using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
+      VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
+      ( parent.*m_destroy )( handle, m_allocationCallbacks, *m_dispatch );
+    }
 
-      template <class Dispatcher>
-      using DestroyFunctionPointerType = void ( DestructorType::* )( HandleType, const AllocationCallbacks *, const Dispatcher & ) const;
-
-      template <class Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
-      ObjectFreeShared( Optional<const AllocationCallbacks> allocationCallbacks VULKAN_HPP_DEFAULT_ARGUMENT_NULLPTR_ASSIGNMENT,
-                        const Dispatcher & dispatch                             VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
-        : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &DestructorType::free ) ) )
-        , m_dispatch( &dispatch )
-        , m_allocationCallbacks( allocationCallbacks )
-      {
-      }
-
-    public:
-      void destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
-      {
-        VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
-        ( parent.*m_destroy )( handle, m_allocationCallbacks, *m_dispatch );
-      }
-
-    private:
-      DestroyFunctionPointerType<detail::DispatchLoaderBase> m_destroy             = nullptr;
-      const detail::DispatchLoaderBase *                     m_dispatch            = nullptr;
-      Optional<const AllocationCallbacks>                    m_allocationCallbacks = nullptr;
-    };
-
-    template <typename HandleType>
-    class ObjectReleaseShared
+    template <typename T = HandleType>
+    typename std::enable_if<!HasDestructor<T>::value, void>::type destroy( HandleType handle ) const VULKAN_HPP_NOEXCEPT
     {
-    public:
-      using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
+      VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
+      ( handle.*m_destroy )( m_allocationCallbacks, *m_dispatch );
+    }
 
-      template <class Dispatcher>
-      using DestroyFunctionPointerType = void ( DestructorType::* )( HandleType, const Dispatcher & ) const;
+  private:
+    DestroyFunctionPointerType<DispatchLoaderBase> m_destroy             = nullptr;
+    const DispatchLoaderBase *                     m_dispatch            = nullptr;
+    Optional<const AllocationCallbacks>            m_allocationCallbacks = nullptr;
+  };
 
-      template <class Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
-      ObjectReleaseShared( const Dispatcher & dispatch VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
-        : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &DestructorType::release ) ) )
-        , m_dispatch( &dispatch )
-      {
-      }
+  template <typename HandleType>
+  class ObjectFreeShared
+  {
+  public:
+    using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
 
-    public:
-      void destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
-      {
-        VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
-        ( parent.*m_destroy )( handle, *m_dispatch );
-      }
+    template <class Dispatcher>
+    using DestroyFunctionPointerType = void ( DestructorType::* )( HandleType, const AllocationCallbacks *, const Dispatcher & ) const;
 
-    private:
-      DestroyFunctionPointerType<detail::DispatchLoaderBase> m_destroy  = nullptr;
-      const detail::DispatchLoaderBase *                     m_dispatch = nullptr;
-    };
-
-    template <typename HandleType, typename PoolType>
-    class PoolFreeShared
+    template <class Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    ObjectFreeShared( Optional<const AllocationCallbacks> allocationCallbacks VULKAN_HPP_DEFAULT_ARGUMENT_NULLPTR_ASSIGNMENT,
+                      const Dispatcher & dispatch                             VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
+      : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &DestructorType::free ) ) )
+      , m_dispatch( &dispatch )
+      , m_allocationCallbacks( allocationCallbacks )
     {
-    public:
-      using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
+    }
 
-      using PoolTypeExport = PoolType;
+  public:
+    void destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
+    {
+      VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
+      ( parent.*m_destroy )( handle, m_allocationCallbacks, *m_dispatch );
+    }
 
-      template <class Dispatcher>
-      using ReturnType = decltype( std::declval<DestructorType>().free( PoolType(), 0u, nullptr, Dispatcher() ) );
+  private:
+    DestroyFunctionPointerType<DispatchLoaderBase> m_destroy             = nullptr;
+    const DispatchLoaderBase *                     m_dispatch            = nullptr;
+    Optional<const AllocationCallbacks>            m_allocationCallbacks = nullptr;
+  };
 
-      template <class Dispatcher>
-      using DestroyFunctionPointerType = ReturnType<Dispatcher> ( DestructorType::* )( PoolType, uint32_t, const HandleType *, const Dispatcher & ) const;
+  template <typename HandleType>
+  class ObjectReleaseShared
+  {
+  public:
+    using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
 
-      PoolFreeShared() = default;
+    template <class Dispatcher>
+    using DestroyFunctionPointerType = void ( DestructorType::* )( HandleType, const Dispatcher & ) const;
 
-      template <class Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
-      PoolFreeShared( SharedHandle<PoolType> pool, const Dispatcher & dispatch VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
-        : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &DestructorType::free ) ) )
-        , m_dispatch( &dispatch )
-        , m_pool( std::move( pool ) )
-      {
-      }
+    template <class Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    ObjectReleaseShared( const Dispatcher & dispatch VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
+      : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &DestructorType::release ) ) )
+      , m_dispatch( &dispatch )
+    {
+    }
 
-    public:
-      void destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
-      {
-        VULKAN_HPP_ASSERT( m_destroy && m_dispatch && m_pool );
-        ( parent.*m_destroy )( m_pool.get(), 1u, &handle, *m_dispatch );
-      }
+  public:
+    void destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
+    {
+      VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
+      ( parent.*m_destroy )( handle, *m_dispatch );
+    }
 
-    private:
-      DestroyFunctionPointerType<detail::DispatchLoaderBase> m_destroy  = nullptr;
-      const detail::DispatchLoaderBase *                     m_dispatch = nullptr;
-      SharedHandle<PoolType>                                 m_pool{};
-    };
+  private:
+    DestroyFunctionPointerType<DispatchLoaderBase> m_destroy  = nullptr;
+    const DispatchLoaderBase *                     m_dispatch = nullptr;
+  };
+
+  template <typename HandleType, typename PoolType>
+  class PoolFreeShared
+  {
+  public:
+    using DestructorType = typename SharedHandleTraits<HandleType>::DestructorType;
+
+    template <class Dispatcher>
+    using ReturnType = decltype( std::declval<DestructorType>().free( PoolType(), 0u, nullptr, Dispatcher() ) );
+
+    template <class Dispatcher>
+    using DestroyFunctionPointerType = ReturnType<Dispatcher> ( DestructorType::* )( PoolType, uint32_t, const HandleType *, const Dispatcher & ) const;
+
+    PoolFreeShared() = default;
+
+    template <class Dispatcher = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
+    PoolFreeShared( SharedHandle<PoolType> pool, const Dispatcher & dispatch VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT )
+      : m_destroy( reinterpret_cast<decltype( m_destroy )>( static_cast<DestroyFunctionPointerType<Dispatcher>>( &DestructorType::free ) ) )
+      , m_dispatch( &dispatch )
+      , m_pool( std::move( pool ) )
+    {
+    }
+
+  public:
+    void destroy( DestructorType parent, HandleType handle ) const VULKAN_HPP_NOEXCEPT
+    {
+      VULKAN_HPP_ASSERT( m_destroy && m_dispatch );
+      ( parent.*m_destroy )( m_pool.get(), 1u, &handle, *m_dispatch );
+    }
+
+  private:
+    DestroyFunctionPointerType<DispatchLoaderBase> m_destroy  = nullptr;
+    const DispatchLoaderBase *                     m_dispatch = nullptr;
+    SharedHandle<PoolType>                         m_pool{};
+  };
 
 #  if defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __INTEL_COMPILER )
 #    pragma GCC diagnostic pop
-#  elif defined( __clang__ ) && ( __clang_major__ >= 13 ) && !defined( __INTEL_COMPILER )
-#    pragma clang diagnostic pop
 #  endif
-
-  }  // namespace detail
 
   //======================
   //=== SHARED HANDLEs ===
@@ -478,7 +426,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = NoDestructor;
-    using deleter        = detail::ObjectDestroyShared<Instance>;
+    using deleter        = ObjectDestroyShared<Instance>;
   };
 
   using SharedInstance = SharedHandle<Instance>;
@@ -488,7 +436,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = NoDestructor;
-    using deleter        = detail::ObjectDestroyShared<Device>;
+    using deleter        = ObjectDestroyShared<Device>;
   };
 
   using SharedDevice = SharedHandle<Device>;
@@ -498,7 +446,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectFreeShared<DeviceMemory>;
+    using deleter        = ObjectFreeShared<DeviceMemory>;
   };
 
   using SharedDeviceMemory = SharedHandle<DeviceMemory>;
@@ -508,7 +456,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Fence>;
+    using deleter        = ObjectDestroyShared<Fence>;
   };
 
   using SharedFence = SharedHandle<Fence>;
@@ -518,7 +466,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Semaphore>;
+    using deleter        = ObjectDestroyShared<Semaphore>;
   };
 
   using SharedSemaphore = SharedHandle<Semaphore>;
@@ -528,7 +476,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Event>;
+    using deleter        = ObjectDestroyShared<Event>;
   };
 
   using SharedEvent = SharedHandle<Event>;
@@ -538,7 +486,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<QueryPool>;
+    using deleter        = ObjectDestroyShared<QueryPool>;
   };
 
   using SharedQueryPool = SharedHandle<QueryPool>;
@@ -548,7 +496,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Buffer>;
+    using deleter        = ObjectDestroyShared<Buffer>;
   };
 
   using SharedBuffer = SharedHandle<Buffer>;
@@ -558,7 +506,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<BufferView>;
+    using deleter        = ObjectDestroyShared<BufferView>;
   };
 
   using SharedBufferView = SharedHandle<BufferView>;
@@ -568,7 +516,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Image>;
+    using deleter        = ObjectDestroyShared<Image>;
   };
 
   using SharedImage = SharedHandle<Image>;
@@ -578,7 +526,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<ImageView>;
+    using deleter        = ObjectDestroyShared<ImageView>;
   };
 
   using SharedImageView = SharedHandle<ImageView>;
@@ -588,7 +536,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<ShaderModule>;
+    using deleter        = ObjectDestroyShared<ShaderModule>;
   };
 
   using SharedShaderModule = SharedHandle<ShaderModule>;
@@ -598,7 +546,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<PipelineCache>;
+    using deleter        = ObjectDestroyShared<PipelineCache>;
   };
 
   using SharedPipelineCache = SharedHandle<PipelineCache>;
@@ -608,7 +556,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Pipeline>;
+    using deleter        = ObjectDestroyShared<Pipeline>;
   };
 
   using SharedPipeline = SharedHandle<Pipeline>;
@@ -618,7 +566,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<PipelineLayout>;
+    using deleter        = ObjectDestroyShared<PipelineLayout>;
   };
 
   using SharedPipelineLayout = SharedHandle<PipelineLayout>;
@@ -628,7 +576,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Sampler>;
+    using deleter        = ObjectDestroyShared<Sampler>;
   };
 
   using SharedSampler = SharedHandle<Sampler>;
@@ -638,7 +586,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<DescriptorPool>;
+    using deleter        = ObjectDestroyShared<DescriptorPool>;
   };
 
   using SharedDescriptorPool = SharedHandle<DescriptorPool>;
@@ -648,7 +596,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::PoolFreeShared<DescriptorSet, DescriptorPool>;
+    using deleter        = PoolFreeShared<DescriptorSet, DescriptorPool>;
   };
 
   using SharedDescriptorSet = SharedHandle<DescriptorSet>;
@@ -658,7 +606,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<DescriptorSetLayout>;
+    using deleter        = ObjectDestroyShared<DescriptorSetLayout>;
   };
 
   using SharedDescriptorSetLayout = SharedHandle<DescriptorSetLayout>;
@@ -668,7 +616,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<Framebuffer>;
+    using deleter        = ObjectDestroyShared<Framebuffer>;
   };
 
   using SharedFramebuffer = SharedHandle<Framebuffer>;
@@ -678,7 +626,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<RenderPass>;
+    using deleter        = ObjectDestroyShared<RenderPass>;
   };
 
   using SharedRenderPass = SharedHandle<RenderPass>;
@@ -688,7 +636,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<CommandPool>;
+    using deleter        = ObjectDestroyShared<CommandPool>;
   };
 
   using SharedCommandPool = SharedHandle<CommandPool>;
@@ -698,7 +646,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::PoolFreeShared<CommandBuffer, CommandPool>;
+    using deleter        = PoolFreeShared<CommandBuffer, CommandPool>;
   };
 
   using SharedCommandBuffer = SharedHandle<CommandBuffer>;
@@ -709,7 +657,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<SamplerYcbcrConversion>;
+    using deleter        = ObjectDestroyShared<SamplerYcbcrConversion>;
   };
 
   using SharedSamplerYcbcrConversion    = SharedHandle<SamplerYcbcrConversion>;
@@ -720,7 +668,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<DescriptorUpdateTemplate>;
+    using deleter        = ObjectDestroyShared<DescriptorUpdateTemplate>;
   };
 
   using SharedDescriptorUpdateTemplate    = SharedHandle<DescriptorUpdateTemplate>;
@@ -732,7 +680,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<PrivateDataSlot>;
+    using deleter        = ObjectDestroyShared<PrivateDataSlot>;
   };
 
   using SharedPrivateDataSlot    = SharedHandle<PrivateDataSlot>;
@@ -744,7 +692,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Instance;
-    using deleter        = detail::ObjectDestroyShared<SurfaceKHR>;
+    using deleter        = ObjectDestroyShared<SurfaceKHR>;
   };
 
   using SharedSurfaceKHR = SharedHandle<SurfaceKHR>;
@@ -755,7 +703,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<SwapchainKHR>;
+    using deleter        = ObjectDestroyShared<SwapchainKHR>;
   };
 
   using SharedSwapchainKHR = SharedHandle<SwapchainKHR>;
@@ -766,7 +714,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = PhysicalDevice;
-    using deleter        = detail::ObjectDestroyShared<DisplayKHR>;
+    using deleter        = ObjectDestroyShared<DisplayKHR>;
   };
 
   using SharedDisplayKHR = SharedHandle<DisplayKHR>;
@@ -777,7 +725,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Instance;
-    using deleter        = detail::ObjectDestroyShared<DebugReportCallbackEXT>;
+    using deleter        = ObjectDestroyShared<DebugReportCallbackEXT>;
   };
 
   using SharedDebugReportCallbackEXT = SharedHandle<DebugReportCallbackEXT>;
@@ -788,7 +736,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<VideoSessionKHR>;
+    using deleter        = ObjectDestroyShared<VideoSessionKHR>;
   };
 
   using SharedVideoSessionKHR = SharedHandle<VideoSessionKHR>;
@@ -798,7 +746,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<VideoSessionParametersKHR>;
+    using deleter        = ObjectDestroyShared<VideoSessionParametersKHR>;
   };
 
   using SharedVideoSessionParametersKHR = SharedHandle<VideoSessionParametersKHR>;
@@ -809,7 +757,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<CuModuleNVX>;
+    using deleter        = ObjectDestroyShared<CuModuleNVX>;
   };
 
   using SharedCuModuleNVX = SharedHandle<CuModuleNVX>;
@@ -819,7 +767,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<CuFunctionNVX>;
+    using deleter        = ObjectDestroyShared<CuFunctionNVX>;
   };
 
   using SharedCuFunctionNVX = SharedHandle<CuFunctionNVX>;
@@ -830,7 +778,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Instance;
-    using deleter        = detail::ObjectDestroyShared<DebugUtilsMessengerEXT>;
+    using deleter        = ObjectDestroyShared<DebugUtilsMessengerEXT>;
   };
 
   using SharedDebugUtilsMessengerEXT = SharedHandle<DebugUtilsMessengerEXT>;
@@ -841,7 +789,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<AccelerationStructureKHR>;
+    using deleter        = ObjectDestroyShared<AccelerationStructureKHR>;
   };
 
   using SharedAccelerationStructureKHR = SharedHandle<AccelerationStructureKHR>;
@@ -852,7 +800,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<ValidationCacheEXT>;
+    using deleter        = ObjectDestroyShared<ValidationCacheEXT>;
   };
 
   using SharedValidationCacheEXT = SharedHandle<ValidationCacheEXT>;
@@ -863,7 +811,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<AccelerationStructureNV>;
+    using deleter        = ObjectDestroyShared<AccelerationStructureNV>;
   };
 
   using SharedAccelerationStructureNV = SharedHandle<AccelerationStructureNV>;
@@ -874,7 +822,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<PerformanceConfigurationINTEL>;
+    using deleter        = ObjectDestroyShared<PerformanceConfigurationINTEL>;
   };
 
   using SharedPerformanceConfigurationINTEL = SharedHandle<PerformanceConfigurationINTEL>;
@@ -885,7 +833,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<DeferredOperationKHR>;
+    using deleter        = ObjectDestroyShared<DeferredOperationKHR>;
   };
 
   using SharedDeferredOperationKHR = SharedHandle<DeferredOperationKHR>;
@@ -896,7 +844,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<IndirectCommandsLayoutNV>;
+    using deleter        = ObjectDestroyShared<IndirectCommandsLayoutNV>;
   };
 
   using SharedIndirectCommandsLayoutNV = SharedHandle<IndirectCommandsLayoutNV>;
@@ -908,7 +856,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<CudaModuleNV>;
+    using deleter        = ObjectDestroyShared<CudaModuleNV>;
   };
 
   using SharedCudaModuleNV = SharedHandle<CudaModuleNV>;
@@ -918,7 +866,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<CudaFunctionNV>;
+    using deleter        = ObjectDestroyShared<CudaFunctionNV>;
   };
 
   using SharedCudaFunctionNV = SharedHandle<CudaFunctionNV>;
@@ -931,7 +879,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<BufferCollectionFUCHSIA>;
+    using deleter        = ObjectDestroyShared<BufferCollectionFUCHSIA>;
   };
 
   using SharedBufferCollectionFUCHSIA = SharedHandle<BufferCollectionFUCHSIA>;
@@ -943,7 +891,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<MicromapEXT>;
+    using deleter        = ObjectDestroyShared<MicromapEXT>;
   };
 
   using SharedMicromapEXT = SharedHandle<MicromapEXT>;
@@ -954,7 +902,7 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<OpticalFlowSessionNV>;
+    using deleter        = ObjectDestroyShared<OpticalFlowSessionNV>;
   };
 
   using SharedOpticalFlowSessionNV = SharedHandle<OpticalFlowSessionNV>;
@@ -965,42 +913,10 @@ namespace VULKAN_HPP_NAMESPACE
   {
   public:
     using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<ShaderEXT>;
+    using deleter        = ObjectDestroyShared<ShaderEXT>;
   };
 
   using SharedShaderEXT = SharedHandle<ShaderEXT>;
-
-  //=== VK_KHR_pipeline_binary ===
-  template <>
-  class SharedHandleTraits<PipelineBinaryKHR>
-  {
-  public:
-    using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<PipelineBinaryKHR>;
-  };
-
-  using SharedPipelineBinaryKHR = SharedHandle<PipelineBinaryKHR>;
-
-  //=== VK_EXT_device_generated_commands ===
-  template <>
-  class SharedHandleTraits<IndirectCommandsLayoutEXT>
-  {
-  public:
-    using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<IndirectCommandsLayoutEXT>;
-  };
-
-  using SharedIndirectCommandsLayoutEXT = SharedHandle<IndirectCommandsLayoutEXT>;
-
-  template <>
-  class SharedHandleTraits<IndirectExecutionSetEXT>
-  {
-  public:
-    using DestructorType = Device;
-    using deleter        = detail::ObjectDestroyShared<IndirectExecutionSetEXT>;
-  };
-
-  using SharedIndirectExecutionSetEXT = SharedHandle<IndirectExecutionSetEXT>;
 
   enum class SwapchainOwns
   {
