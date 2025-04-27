@@ -1,6 +1,6 @@
-#!/usr/bin/python3 -i
+#!/usr/bin/env python3 -i
 #
-# Copyright 2013-2024 The Khronos Group Inc.
+# Copyright 2013-2025 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -58,9 +58,9 @@ class VulkanConventions(ConventionsBase):
             if version == '1.0':
                 return 'Vulkan SC 1.0'
             else:
-                return f'<<versions-sc-{version}, Version SC {version}>>'
+                return f'<<versions-sc-{version}, Vulkan SC Version {version}>>'
         else:
-            return f'<<versions-{version}, Version {version}>>'
+            return f'<<versions-{version}, Vulkan Version {version}>>'
 
     def formatExtension(self, name):
         """Mark up an extension name as a link in the spec."""
@@ -119,6 +119,7 @@ class VulkanConventions(ConventionsBase):
         # The simple-minded rules need modification for some structure names
         subpats = [
             [ r'_H_(26[45])_',              r'_H\1_' ],
+            [ r'_AV_1_',                    r'_AV1_' ],
             [ r'_VULKAN_([0-9])([0-9])_',   r'_VULKAN_\1_\2_' ],
             [ r'_VULKAN_SC_([0-9])([0-9])_',r'_VULKAN_SC_\1_\2_' ],
             [ r'_DIRECT_FB_',               r'_DIRECTFB_' ],
@@ -184,7 +185,7 @@ class VulkanConventions(ConventionsBase):
         For Vulkan, these are names with a case-insensitive 'vk' prefix, or
         a 'PFN_vk' function pointer type prefix.
         """
-        return name[0:2].lower() == 'vk' or name[0:6] == 'PFN_vk'
+        return name[0:2].lower() == 'vk' or name.startswith('PFN_vk')
 
     def specURL(self, spectype='api'):
         """Return public registry URL which ref pages should link to for the
@@ -193,7 +194,7 @@ class VulkanConventions(ConventionsBase):
            instead. N.b. this may need to change on a per-refpage basis if
            there are multiple documents involved.
         """
-        return 'https://registry.khronos.org/vulkan/specs/1.3-extensions/html/vkspec.html'
+        return 'https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html'
 
     @property
     def xml_api_name(self):
