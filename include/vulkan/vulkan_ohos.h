@@ -66,7 +66,7 @@ typedef struct VkSwapchainImageCreateInfoOHOS {
 
 typedef struct VkPhysicalDevicePresentationPropertiesOHOS {
     VkStructureType    sType;
-    const void*        pNext;
+    void*              pNext;
     VkBool32           sharedImage;
 } VkPhysicalDevicePresentationPropertiesOHOS;
 
