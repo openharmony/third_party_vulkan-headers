@@ -36,6 +36,14 @@ VKAPI_ATTR void VKAPI_CALL vkSetFreqAdjustEnable(
     bool                                    enable
 );
 
+typedef PFN_vkVoidFunction(VKAPI_PTR *PFN_vkSetFrontWindowStatusHUAWEI)(VkDevice device,
+                                                                        bool isSingleFullScreenApp,
+                                                                        const char* firstFrontBundleName);
+VKAPI_ATTR void VKAPI_CALL vkSetFrontWindowStatusHUAWEI(
+    VkDevice                                    device,
+    bool                                        isSingleFullScreenApp,
+    const char*                                 firstFrontBundleName
+);
 
 #ifdef __cplusplus
 }
