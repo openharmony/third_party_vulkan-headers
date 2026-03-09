@@ -69,10 +69,10 @@ extern "C" {
 #define VK_API_VERSION_1_0 VK_MAKE_API_VERSION(0, 1, 0, 0)// Patch version should always be set to 0
 
 // Version of this file
-#define VK_HEADER_VERSION 275
+#define VK_HEADER_VERSION 309
 
 // Complete version of this file
-#define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, 1, 3, VK_HEADER_VERSION)
+#define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, 1, 4, VK_HEADER_VERSION)
 
 // VK_MAKE_VERSION is deprecated, but no reason was given in the API XML
 // DEPRECATED: This define is deprecated. VK_MAKE_API_VERSION should be used instead.
