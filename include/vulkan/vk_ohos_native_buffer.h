@@ -16,6 +16,8 @@
 #ifndef VK_OHOS_NATIVE_BUFFER_H_
 #define VK_OHOS_NATIVE_BUFFER_H_ 1
 
+#include <vulkan/vulkan.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
